@@ -1,0 +1,128 @@
+{
+
+	"model" : "conv2-fc2.bin",
+	"save_epoch" : 100,
+	"input_dims" : [65,140,3],
+
+	"layers" : [
+		{
+			"type" : "image_data",
+			"name" : "image_data_layer",
+			"label_file" : "label.txt",
+			"data_dir" : "data",
+			"iter" : 50,
+			"batch" : 100,
+			"loop" : 1000,
+			"data" : 0,
+			"label" : -1
+		},
+
+		{
+			"type" : "conv",
+			"name" : "conv1",
+			"input" : 0,
+			"output" : 1,
+			"kernel_size" : 5,
+			"kernel_num" : 10,
+			"kernel_stride" : 3
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu1",
+			"input" : 1,
+			"output" : 2,
+			"negtive_slope" : -1
+		},
+
+		{
+			"type" : "conv",
+			"name" : "conv2",
+			"input" : 2,
+			"output" : 3,
+			"kernel_size" : 5,
+			"kernel_num" : 20,
+			"kernel_stride" : 4
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu2",
+			"input" : 3,
+			"output" : 4,
+			"negtive_slope" : -1
+		},
+
+		{
+			"type" : "inner_product",
+			"name" : "fc1",
+			"inputs" : [4],
+			"output" : 5,
+			"output_num" : 500
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu3",
+			"input" : 5,
+			"output" : 6,
+			"negtive_slope" : -1
+		},
+
+		{
+			"type" : "inner_product",
+			"name" : "fc2",
+			"inputs" : [6],
+			"output" : 7,
+			"output_num" : 36
+		},
+
+		{
+			"type" : "softmax_loss",
+			"name" : "softmax_loss",
+			"input" : 7,
+			"label" : -1
+		},
+
+		{
+			"type" : "softmax",
+			"name" : "softmax",
+			"input" : 7,
+			"output" : 8
+		}
+	],
+	"dict" : {
+		"0":"0", "1":"1", "2":"2", "3":"3", "4":"4", "5":"5", "6":"6",
+		"7":"7", "8":"8", "9":"9", "10":"a", "11":"b", "12":"c", "13":"d",
+		"14":"e", "15":"f", "16":"g", "17":"h", "18":"i", "19":"j", "20":"k",
+		"21":"l", "22":"m", "23":"n", "24":"o", "25":"p", "26":"q", "27":"r",
+		"28":"s", "29":"t", "30":"u", "31":"v", "32":"w", "33":"x", "34":"y",
+		"35":"z"
+	},
+
+
+	"train" : {
+		"setup_block" : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
+		"setup_params" : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
+		"begin_seq"    : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
+		"activation" : [
+			["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
+			["fc1", "relu3", "fc2", "softmax_loss"]
+		],
+		"loss" : "softmax_loss",
+		"data" : "image_data_layer",
+		"stop_loss" : 0.05
+	},
+
+	"predict" : {
+		"setup_block" : ["conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax"],
+		"setup_params" : ["conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax"],
+		"begin_seq" : ["conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax"],
+		"activation" : [
+			["conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax"],
+			["fc1", "relu3", "fc2", "softmax_loss"]
+		],
+		"input" : 0,
+		"output" : 8
+	}
+}
