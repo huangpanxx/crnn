@@ -4,6 +4,8 @@
 *.o
 *.obj
 
+*.vcxproj
+
 # Precompiled Headers
 *.gch
 *.pch
@@ -26,3 +28,14 @@
 *.exe
 *.out
 *.app
+
+Debug
+Release
+
+*.sdf
+*.suo
+*.filters
+*.user
+*.opensdf
+*.psess
+*.vsp
