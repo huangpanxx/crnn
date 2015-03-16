@@ -428,7 +428,7 @@ void stbi_image_free(void *retval_from_stbi_load)
    free(retval_from_stbi_load);
 }
 
-#define MAX_LOADERS  32
+#define MAX_LOADERS  64
 stbi_loader *loaders[MAX_LOADERS];
 static int max_loaders = 0;
 

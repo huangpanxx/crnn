@@ -12,6 +12,7 @@ vector<array_sample> load_images(const string& dirname, const string& label_file
     fin >> label_size;
     CHECK(label_size > 0);
     vector<array_sample> samples;
+    int k = 0;
     while (fin) {
         string line;
         while (fin) {
@@ -34,8 +35,10 @@ vector<array_sample> load_images(const string& dirname, const string& label_file
             vlabel.push_back(nlabel);
         }
         string file_path = dirname + "/" + file_name;
+        ++k;
+        printf("%d loading %s .\r",k, file_name.c_str());
         array3d image = imread(file_path);
-        if (image.size() == 0){
+        if (image.size() == 0) { 
             cout << "load image " << file_name << "failed" << endl;
             continue;
         }
@@ -49,6 +52,7 @@ vector<array_sample> load_images(const string& dirname, const string& label_file
             CHECK(cmp_array_dim(samples.front().data(), samples.back().data()));
         }
     }
+    printf("\n");
     CHECK(samples.size() > 0);
     return samples;
 }
