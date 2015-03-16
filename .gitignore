@@ -4,8 +4,6 @@
 *.o
 *.obj
 
-*.vcxproj
-
 # Precompiled Headers
 *.gch
 *.pch
