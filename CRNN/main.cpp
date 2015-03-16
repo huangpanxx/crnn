@@ -328,6 +328,18 @@ void test_network(const string& filename) {
     }
 }
 
+void test(){
+    for (int i = 0; i < 99999; ++i){
+        float v = float(i);
+        int k = (int)ceil(v);
+        if (v != i) {
+            printf("%d ", i);
+            system("pause");
+        }
+    }
+
+}
+
 int main(int argc, char **argv) {
     //test_stream();
     //test_conv();

@@ -83,6 +83,7 @@
     <ClInclude Include="multi_softmax_loss_layer.h" />
     <ClInclude Include="network.h" />
     <ClInclude Include="picojson.h" />
+    <ClInclude Include="pooling_layer.h" />
     <ClInclude Include="relu_layer.h" />
     <ClInclude Include="sigmoid_layer.h" />
     <ClInclude Include="softmax_layer.h" />
@@ -101,6 +102,7 @@
     <ClCompile Include="multi_softmax_layer.cpp" />
     <ClCompile Include="multi_softmax_loss_layer.cpp" />
     <ClCompile Include="network.cpp" />
+    <ClCompile Include="pooling_layer.cpp" />
     <ClCompile Include="relu_layer.cpp" />
     <ClCompile Include="sigmoid_layer.cpp" />
     <ClCompile Include="softmax_layer.cpp" />

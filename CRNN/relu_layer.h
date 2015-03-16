@@ -8,8 +8,11 @@ public:
     relu_layer(
         std::shared_ptr<block> input_block,
         std::shared_ptr<block> output_block,
-        float negtive_slope = -1.0f);
+        bool share = false);
+
     virtual void setup_block();
+    virtual void setup_params();
+
     virtual bool forward(int t);
     virtual void backward(int t);
     virtual bool begin_seq();
@@ -17,19 +20,16 @@ public:
     virtual void save(std::ostream& os);
     virtual void load(std::istream& is);
 
+    virtual void end_batch(int size);
+
 private:
     std::shared_ptr<block> m_input_block;
     std::shared_ptr<block> m_output_block;
     std::vector<array> m_input_history;
-    float m_negtive_slop;
+    bool m_share;
 
-    inline float relu(float x) {
-        return x >= 0.0f ? x : x * m_negtive_slop;
-    }
-
-    inline float rrelu(float x) {
-        return x >= 0 ? 1.0f : m_negtive_slop;
-    }
+    array m_negtive_slop;
+    array m_negtive_slop_grad;
 };
 
 #endif

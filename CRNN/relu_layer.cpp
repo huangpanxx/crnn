@@ -5,10 +5,10 @@ using namespace std;
 relu_layer::relu_layer(
     std::shared_ptr<block> input_block,
     std::shared_ptr<block> output_block,
-    float negtive_slope) {
+    bool share) {
     this->m_input_block = input_block;
     this->m_output_block = output_block;
-    this->m_negtive_slop = negtive_slope;
+    this->m_share = share;
 }
 
 void  relu_layer::setup_block() {
@@ -19,7 +19,18 @@ void  relu_layer::setup_block() {
     else{
         this->m_output_block->resize(this->m_input_block->dims());
     }
+}
 
+void relu_layer::setup_params() {
+    const int sz = m_share ? 1 : this->m_input_block->size();
+    if (m_negtive_slop.size() == 0){
+        this->m_negtive_slop = array(sz);
+        this->m_negtive_slop.clear(0.1f);
+    }
+    CHECK(m_negtive_slop.size() == sz);
+
+    this->m_negtive_slop_grad = m_negtive_slop.clone(false);
+    this->m_negtive_slop_grad.clear(0);
 }
 
 
@@ -30,7 +41,12 @@ bool relu_layer::forward(int t) {
 
     OMP_FOR
     for (int i = 0; i < size; ++i) {
-        output.at(i) = relu(input.at(i));
+        float val = input.at(i);
+        if (val < 0) {
+            int k = m_share ? 0 : i;
+            val *= m_negtive_slop.at(k);
+        }
+        output.at(i) = val;
     }
 
     this->m_input_history.push_back(input);
@@ -46,7 +62,16 @@ void relu_layer::backward(int t) {
 
     OMP_FOR
     for (int i = 0; i < size; ++i) {
-        ierror.at(i) += oerror.at(i) *  rrelu(input.at(i));
+        float val = input.at(i);
+        float err = oerror.at(i);
+        if (val < 0) {
+            int k = m_share ? 0 : i;
+            //grad slop
+            m_negtive_slop_grad.at(k) += err * val;
+            //bp error
+            err *= m_negtive_slop.at(k);
+        }
+        ierror.at(i) += err;
     }
 
     this->m_input_history.pop_back();
@@ -61,24 +86,32 @@ bool relu_layer::begin_seq() {
 }
 
 void relu_layer::save(std::ostream& os) {
-    write_val_to_stream(os, this->m_negtive_slop);
+    write_array_to_stream(os, this->m_negtive_slop);
 }
 
 void relu_layer::load(std::istream& is) {
-    read_val_from_stream(is, this->m_negtive_slop);
+    this->m_negtive_slop = read_array_from_stream(is);
+}
+
+void relu_layer::end_batch(int size) {
+    float md = this->momentum_decay();
+    float lr = this->learn_rate() / size;
+
+    m_negtive_slop.mul_add(m_negtive_slop_grad, lr / (1.0f + md));
+    m_negtive_slop_grad.mul(md / (md + 1.0f));
 }
 
 layer_ptr create_relu_layer(const picojson::value& config,
     block_factory& bf) {
-    CHECK(config.contains("negtive_slope"));
     CHECK(config.contains("input"));
     CHECK(config.contains("output"));
-    float slope = (float)config.get("negtive_slope").get<double>();
+    CHECK(config.contains("share"));
     int input_block_id = (int)config.get("input").get<double>();
     int output_block_id = (int) config.get("output").get<double>();
     auto input_block = bf.get_block(input_block_id);
     auto output_block = bf.get_block(output_block_id);
-    return layer_ptr(new relu_layer(input_block, output_block, slope));
+    bool share = config.get("share").get<bool>();
+    return layer_ptr(new relu_layer(input_block, output_block, share));
 }
 
 REGISTER_LAYER(relu, create_relu_layer);
