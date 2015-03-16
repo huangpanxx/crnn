@@ -12,7 +12,7 @@ multi_softmax_loss_layer::multi_softmax_loss_layer(
     this->m_loss_sum = 0;
 }
 
-void multi_softmax_loss_layer::setup_block() { 
+void multi_softmax_loss_layer::setup_block() {
     CHECK((int)this->m_label_block->dims().size() == 2);
     CHECK(this->m_label_block->dims()[0] == (int)this->m_input_blocks.size());
     for (auto& block : m_input_blocks) {
@@ -26,8 +26,6 @@ void multi_softmax_loss_layer::setup_params() {
 }
 
 bool multi_softmax_loss_layer::begin_seq() {
-    this->m_loss_num = 0;
-    this->m_loss_sum = 0;
     this->m_output_history.clear();
     return true;
 }
@@ -63,12 +61,12 @@ bool multi_softmax_loss_layer::forward(int t) {
 }
 
 void multi_softmax_loss_layer::backward(int t){
-    array2d label =  m_label_block->signal();
+    array2d label = m_label_block->signal();
     const int label_num = label.rows();
     const int label_size = label.cols();
-    const auto &outputs = m_output_history.back(); 
+    const auto &outputs = m_output_history.back();
 
-OMP_FOR
+    OMP_FOR
     for (int i = 0; i < label_num; ++i) {
         auto &err = m_input_blocks[i]->error();
         auto &output = outputs[i];
@@ -87,11 +85,16 @@ float multi_softmax_loss_layer::loss() {
     return floss;
 }
 
+void multi_softmax_loss_layer::end_batch(){
+    this->m_loss_num = 0;
+    this->m_loss_sum = 0;
+}
+
 layer_ptr create_multi_softmax_loss_layer(
     const picojson::value& config,
     block_factory& bf){
     //inputs
-    auto input_ids_arr =  config.get("inputs").get<picojson::array>();
+    auto input_ids_arr = config.get("inputs").get<picojson::array>();
     vector<int> input_ids;
     for (auto& val : input_ids_arr){
         auto id = (int) val.get<double>();

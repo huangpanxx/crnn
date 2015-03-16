@@ -346,7 +346,6 @@ int main(int argc, char **argv) {
     //test_xor();
     //test_mlp();
     //test_omp();
-    //return 0;
     string model_file = "";
     if (argc == 2) {
         model_file = argv[1];
