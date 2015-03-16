@@ -185,3 +185,36 @@ std::string promote_file_name(const std::string& promote){
     }
     return file_name;
 }
+
+void softmax_normalize(const array& src, array& dst) {
+    assert(src.size() == dst.size());
+    int sz = src.size();
+    const float mmax = src.max();
+OMP_FOR
+    for (int i = 0; i < sz; ++i) {
+        dst.at(i) = exp(src.at(i) - mmax);
+    }
+    dst.mul(1.0f / dst.sum());
+}
+
+void softmax_normalize(const array& src, array2d& dst, int row){
+    assert(src.size() == dst.cols());
+    assert(row >= 0 && row < dst.rows());
+    int sz = src.size();
+    const float mmax = src.max();
+    //exp
+OMP_FOR
+    for (int i = 0; i < sz; ++i) {
+        dst.at2(row, i) = exp(src.at(i) - mmax);
+    }
+    //sum
+    float ssum = 0;
+    for (int i = 0; i < sz; ++i){
+        ssum += dst.at2(row, i);
+    }
+    //normalize
+OMP_FOR
+    for (int i = 0; i < sz; ++i){
+        dst.at2(row, i) /= ssum;
+    }
+}

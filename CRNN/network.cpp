@@ -118,6 +118,7 @@ vector<layer_ptr> network::get_layers(const picojson::value& val){
 layer_ptr network::get_layer(const std::string &name) {
     if (m_layer_cache.count(name) == 0) {
         auto arr = m_config.get("layers").get<picojson::array>();
+        bool is_created = false;
         for (auto v : arr) {
             if (v.get("name").get<string>() == name){
                 auto type = v.get("type").get<string>();
@@ -127,8 +128,13 @@ layer_ptr network::get_layer(const std::string &name) {
                 auto layer = fn(v, this->m_block_factory);
                 config_layer(v, layer);
                 m_layer_cache[name] = layer;
+                is_created = true;
                 break;
             }
+        }
+        if (!is_created){
+            printf("%s is not registed.\n", name.c_str());
+            CHECK(is_created);
         }
     }
     return m_layer_cache[name];
@@ -149,7 +155,7 @@ void network::config_layer(picojson::value& val, layer_ptr& layer){
     layer->set_learn_rate(m_learn_rate);
 
     if (val.contains("learn_rate")) {
-        float lr = (float)val.get("learn_rate").get<double>();
+        float lr = (float) val.get("learn_rate").get<double>();
         layer->set_learn_rate(lr);
     }
 
@@ -157,6 +163,10 @@ void network::config_layer(picojson::value& val, layer_ptr& layer){
         float momentum = (float) val.get("momentum").get<double>();
         layer->set_momentum_decay(momentum);
     }
+    printf("layer %s, learn_rate = %.8f, momentum = %0.8f.\n",
+        name.c_str(),
+        layer->learn_rate(),
+        layer->momentum_decay());
 }
 
 

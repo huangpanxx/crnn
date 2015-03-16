@@ -58,7 +58,7 @@ public:
 
     void clear(float val = 0) {
         int sz = this->size();
-        #pragma omp parallel for
+        OMP_FOR
         for (int i = 0; i < sz; ++i) {
             this->at(i) = val;
         }
@@ -67,7 +67,7 @@ public:
     void mul_add(const array& src, float v) {
         assert(src.size() == this->size());
         int sz = this->size();
-        #pragma omp parallel for
+        OMP_FOR
         for (int i = 0; i < sz; ++i){
             at(i) += src.at(i) * v;
         }
@@ -75,14 +75,14 @@ public:
 
     void add(const array& src) {
         assert(src.size() == this->size());
-        #pragma omp parallel for
+        OMP_FOR
         for (int i = 0; i < this->size(); ++i){
             at(i) += src.at(i);
         }
     }
 
     void mul(float v){
-        #pragma omp parallel for
+        OMP_FOR
         for (int i = 0; i < this->size(); ++i){
             at(i) *= v;
         }
@@ -122,7 +122,7 @@ public:
         copy_data(src, *this);
     }
 
-    float max(){
+    float max() const{
         int sz = this->size();
         assert(sz > 0);
         float mmax = this->at(0);
@@ -170,7 +170,7 @@ private:
 
     static void copy_data(const array& src, array& dst){
         assert(src.size() == dst.size());
-        #pragma omp parallel for
+        OMP_FOR
         for (int i = 0; i < src.size(); ++i){
             dst.at(i) = src.at(i);
         }
@@ -208,6 +208,17 @@ public:
         assert(col >= 0 && col < _cols);
         return this->at(row * _cols + col);
     }
+    int arg_max_row(int row) const {
+        assert(size() > 0);
+        const int col = cols();
+        int k = 0;
+        for (int i = 1; i < col; ++i){
+            if (at2(row, k) < at2(row, i)) {
+                k = i;
+            }
+        }
+        return k;
+    }
 };
 
 class array3d : public array {
@@ -243,7 +254,7 @@ inline void mul_addv(const array2d& a, const array&b, array& c){
     assert(a.rows() == c.size());
     assert(a.cols() == b.size());
     int row = a.rows(), col = a.cols();
-    #pragma omp parallel for
+    OMP_FOR
     for (int i = 0; i < row; ++i){
         float s = 0;
         for (int j = 0; j < col; ++j){
@@ -258,7 +269,7 @@ inline void mul_addh(const array& a, const array2d&b, array& c){
     assert(a.size() == b.rows());
     assert(c.size() == b.cols());
     int row = b.rows(), col = b.cols();
-    #pragma omp parallel for
+    OMP_FOR
     for (int i = 0; i < col; ++i){
         float s = 0;
         for (int j = 0; j < row; ++j){
@@ -271,7 +282,7 @@ inline void mul_addh(const array& a, const array2d&b, array& c){
 inline void add_to(const array& src, array& dst){
     assert(src.size() == dst.size());
     const int sz = src.size();
-    #pragma omp parallel for
+    OMP_FOR
     for (int i = 0; i < sz; ++i){
         dst.at(i) += src.at(i);
     }

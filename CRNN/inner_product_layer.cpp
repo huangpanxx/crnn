@@ -117,7 +117,7 @@ void inner_product_layer::backward(int t) {
         auto& input = inputs[i];
         auto& gw = m_grad_weights[i];
         int esz = error.size(), isz = input.size();
-#pragma omp parallel for
+OMP_FOR
         for (int j = 0; j < esz; ++j) {
             for (int k = 0; k < isz; ++k) {
                 gw.at2(j, k) += input.at(k) * error.at(j);

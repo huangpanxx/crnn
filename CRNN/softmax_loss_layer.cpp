@@ -1,4 +1,5 @@
 #include "softmax_loss_layer.h"
+#include "utility.h"
 using namespace std;
 
 softmax_loss_layer::softmax_loss_layer(
@@ -30,26 +31,13 @@ bool softmax_loss_layer::begin_seq() {
 bool softmax_loss_layer::forward(int t){
     auto& input = m_input_block->signal();
     array2d label = m_label_block->signal();
-    array output = m_input_block->signal().clone();
+    array &output = m_input_block->signal().clone();
     m_output_history.push_back(output);
 
-    //find max val
-    float mmax = input.max();
-
-    //exp(val-max)
-    #pragma omp parallel for
-    for (int i = 0; i < input.size(); ++i) {
-        float dv = input.at(i) - mmax;
-        output.at(i) = exp(dv);
-    }
-
-
-    //normalize
-    float sum = output.sum();
-    output.mul(1.0f / sum);
+    softmax_normalize(input, output);
 
     //compute loss
-    #pragma omp parallel for
+    OMP_FOR
     for (int i = 0; i < output.size(); ++i) {
         float lb = label.at2(t, i);
         if (fabs(lb) > 1e-5) {
@@ -58,6 +46,7 @@ bool softmax_loss_layer::forward(int t){
     }
     m_loss_num += 1;
 
+    //print output
     if (m_report) {
         for (int i = 0; i < output.size(); ++i) {
             cout << i
@@ -78,7 +67,7 @@ void softmax_loss_layer::backward(int t) {
     array2d label = m_label_block->signal();
     m_output_history.pop_back();
 
-    #pragma omp parallel for
+    OMP_FOR
     for (int i = 0; i < error.size(); ++i) {
         error.at(i) = label.at2(t, i) - output.at(i);
     }

@@ -72,8 +72,8 @@ void test_mlp(){
 
     shared_ptr<image_data_layer> data_layer(
         new image_data_layer(
-        "C:\\Users\\snail\\Desktop\\data",
-        "C:\\Users\\snail\\Desktop\\label.txt",
+        "data",
+        "label.txt",
         data_block, label_block, 15, 10000, 100));
 
     shared_ptr<inner_product_layer> fc1_layer(
@@ -312,11 +312,14 @@ void test_network(const string& filename) {
             //recongnize
             int start_time = clock();
             predict_net.set_input(image);
+            array2d output = predict_net.forward();
             string ans = "";
-            for (int i = 0; i < 4; ++i) {
-                auto output = predict_net.forward();
-                ans += predict_net.translate(output.arg_max());
+            for (int i = 0; i < output.rows(); ++i) {
+                int k = output.arg_max_row(i);
+                ans += predict_net.translate(k);
+                printf("%.3f ", output.at2(i, k));
             }
+            printf("\n");
 
             //print info
             float freq = 1.0f * CLOCKS_PER_SEC / (clock() - start_time);
@@ -331,6 +334,7 @@ int main(int argc, char **argv) {
     //test_xor();
     //test_mlp();
     //test_omp();
+    //return 0;
     string model_file = "";
     if (argc == 2) {
         model_file = argv[1];

@@ -97,7 +97,7 @@ bool conv_layer::forward(int t) {
     const int orows = output.rows(), ocols = output.cols(), ochannels = (int)m_weights.size();
 
     //for each output point
-    #pragma omp parallel for
+    OMP_FOR
     for (int och = 0; och < ochannels; ++och){
         auto& w = m_weights[och];
         float bias = m_bias.at(och);
@@ -136,7 +136,7 @@ void conv_layer::backward(int t) {
     const int orows = oerror.rows(), ocols = oerror.cols(), ochannels = oerror.channels();
 
     //for output point
-    #pragma omp parallel for
+    OMP_FOR
     for (int och = 0; och < ochannels; ++och) {
         auto& w = m_weights[och];
         auto& gw = m_grad_weights[och];

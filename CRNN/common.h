@@ -14,11 +14,19 @@
 #include <ctime>
 
 #ifndef _DEBUG
+
 #undef assert
 #define assert(x)
+#define OMP_FOR __pragma(omp parallel for)
+//#define OMP_FOR
+
 #else
 
+#define OMP_FOR
+
 #endif
+
+
 
 
 inline void print_check(const char* msg, const char* filename, int line) {

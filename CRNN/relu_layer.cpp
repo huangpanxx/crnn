@@ -28,7 +28,7 @@ bool relu_layer::forward(int t) {
     auto& input = this->m_input_block->signal();
     int size = input.size();
 
-    #pragma omp parallel for
+    OMP_FOR
     for (int i = 0; i < size; ++i) {
         output.at(i) = relu(input.at(i));
     }
@@ -44,7 +44,7 @@ void relu_layer::backward(int t) {
     auto& input = this->m_input_history.back();
     int size = ierror.size();
 
-    #pragma omp parallel for
+    OMP_FOR
     for (int i = 0; i < size; ++i) {
         ierror.at(i) += oerror.at(i) *  rrelu(input.at(i));
     }
@@ -70,6 +70,9 @@ void relu_layer::load(std::istream& is) {
 
 layer_ptr create_relu_layer(const picojson::value& config,
     block_factory& bf) {
+    CHECK(config.contains("negtive_slope"));
+    CHECK(config.contains("input"));
+    CHECK(config.contains("output"));
     float slope = (float)config.get("negtive_slope").get<double>();
     int input_block_id = (int)config.get("input").get<double>();
     int output_block_id = (int) config.get("output").get<double>();

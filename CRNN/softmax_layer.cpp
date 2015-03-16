@@ -1,4 +1,5 @@
 #include "softmax_layer.h"
+#include "utility.h"
 using namespace std;
 
 softmax_layer::softmax_layer(
@@ -18,26 +19,18 @@ void softmax_layer::setup_block() {
 bool softmax_layer::forward(int t) {
     auto& input = this->m_input_block->signal();
     auto& output = this->m_output_block->new_signal();
-    float mmax = input.max();
-    int sz = input.size();
-
-    #pragma omp parallel for
-    for (int i = 0; i < sz; ++i) {
-        output.at(i) = exp(input.at(i) - mmax);
-    }
-    float sum = output.sum();
-    output.mul(1.0f / sum);
+    softmax_normalize(input, output);
     return true;
 }
 
 void softmax_layer::backward(int t) {
     //NOT IMPLEMENT
-    assert(0);
+    CHECK(0);
 }
 
 void softmax_layer::end_batch(int size) {
     //NOT IMPLEMENT
-    assert(0);
+    CHECK(0);
 }
 
 

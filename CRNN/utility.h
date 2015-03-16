@@ -60,4 +60,8 @@ bool yes_no(const std::string& promote);
 
 std::string promote_file_name(const std::string& promote);
 
+void softmax_normalize(const array& src, array& dst);
+
+void softmax_normalize(const array& src, array2d& dst, int row);
+
 #endif

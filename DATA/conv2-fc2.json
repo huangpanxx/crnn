@@ -3,6 +3,7 @@
 	"model" : "conv2-fc2.bin",
 	"save_epoch" : 100,
 	"input_dims" : [65,140,3],
+	"learn_rate" : 0.01,
 
 	"layers" : [
 		{
@@ -78,9 +79,33 @@
 		},
 
 		{
-			"type" : "softmax_loss",
-			"name" : "softmax_loss",
-			"input" : 7,
+			"type" : "inner_product",
+			"name" : "fc3",
+			"inputs" : [6],
+			"output" : 8,
+			"output_num" : 36
+		},
+
+		{
+			"type" : "inner_product",
+			"name" : "fc4",
+			"inputs" : [6],
+			"output" : 9,
+			"output_num" : 36
+		},
+
+		{
+			"type" : "inner_product",
+			"name" : "fc5",
+			"inputs" : [6],
+			"output" : 10,
+			"output_num" : 36
+		},
+
+		{
+			"type" : "multi_softmax_loss",
+			"name" : "multi_softmax_loss",
+			"inputs" : [7, 8, 9, 10],
 			"label" : -1
 		},
 
@@ -102,14 +127,13 @@
 
 
 	"train" : {
-		"setup_block" : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
-		"setup_params" : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
-		"begin_seq"    : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
+		"setup_block" :  ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "fc3", "fc4", "fc5", "multi_softmax_loss"],
+		"setup_params" : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "fc3", "fc4", "fc5", "multi_softmax_loss"],
+		"begin_seq"    : ["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "fc3", "fc4", "fc5", "multi_softmax_loss"],
 		"activation" : [
-			["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "softmax_loss"],
-			["fc1", "relu3", "fc2", "softmax_loss"]
+			["image_data_layer", "conv1", "relu1", "conv2", "relu2", "fc1", "relu3", "fc2", "fc3", "fc4", "fc5", "multi_softmax_loss"]
 		],
-		"loss" : "softmax_loss",
+		"loss" : "multi_softmax_loss",
 		"data" : "image_data_layer",
 		"stop_loss" : 0.05
 	},

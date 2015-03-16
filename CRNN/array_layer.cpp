@@ -66,8 +66,14 @@ bool array_layer::forward(int t) {
 }
 
 void array_layer::move_to_next_batch() {
+    //move
     int group = m_iter * m_batch;
     m_index += group - (m_index % group) - 1;
+
+    //print
+    int k = m_index / group;
+    int idx = (k * m_batch + (m_index % group) % m_batch) % (int) m_samples.size();
+    printf("data continued from index %d(%d).\n", idx, m_index);
 }
 
 void array_layer::save(std::ostream& os) {
@@ -76,8 +82,9 @@ void array_layer::save(std::ostream& os) {
 
 void array_layer::load(std::istream& is) {
     read_val_from_stream(is, m_index);
-    if (m_index >= (int)this->m_samples.size() * this->m_iter * m_loop || m_index < 0){
+    if (m_index >= (int)this->m_samples.size() * this->m_iter * m_loop 
+        || m_index < 0) {
         m_index = 0;
     }
-    printf("data continued from index %d.\n", m_index);
+    this->move_to_next_batch();
 }
