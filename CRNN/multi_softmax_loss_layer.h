@@ -15,7 +15,7 @@ public:
     virtual bool forward(int t);
     virtual void backward(int t);
 
-    virtual void end_batch();
+    virtual void end_batch(int t);
 
     virtual float loss();
 

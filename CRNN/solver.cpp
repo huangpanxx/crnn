@@ -23,14 +23,16 @@ void end_batch_and_report_loss(const vector<shared_ptr<layer> > &layer_seq,
     shared_ptr<loss_layer> loss_layer,
     function<void(int epoch)> end_batch_fn,
     int batch, int epoch) {
-    //grad
-    end_batch(layer_seq, batch);
 
     //loss
     float loss = loss_layer->loss();
-    cout << "epoch " << epoch 
-         << ", loss " << loss 
-         << "                                        " << endl;
+    cout << "epoch " << epoch
+        << ", loss " << loss
+        << "                                        " << endl;
+
+    //grad
+    end_batch(layer_seq, batch);
+
 
     //end batch callback
     end_batch_fn(epoch);

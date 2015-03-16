@@ -85,7 +85,7 @@ float multi_softmax_loss_layer::loss() {
     return floss;
 }
 
-void multi_softmax_loss_layer::end_batch(){
+void multi_softmax_loss_layer::end_batch(int t){
     this->m_loss_num = 0;
     this->m_loss_sum = 0;
 }

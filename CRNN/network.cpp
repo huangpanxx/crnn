@@ -182,16 +182,16 @@ void network::train() {
         const int epoch = iter / batch;
         //batch
         if (iter % batch == 0 && iter) {
-            //end batch
-            for (auto &layer : this->m_beg_layer_seq) {
-                layer->end_batch(batch);
-            }
-
             //print info
             float freq = (float) (batch) * CLOCKS_PER_SEC / (clock() - start_time);
             float loss = m_loss_layer->loss();
             printf("epoch %d, %.3f iter/s, loss = %.8f.                     \n",
                 epoch, freq, loss);
+
+            //end batch
+            for (auto &layer : this->m_beg_layer_seq) {
+                layer->end_batch(batch);
+            }
 
             //save
             if (epoch % m_save_epoch == m_save_epoch - 1) {
