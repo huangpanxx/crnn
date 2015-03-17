@@ -17,12 +17,14 @@ bool max_pooling_layer::begin_seq() {
 void max_pooling_layer::setup_block() {
     CHECK(this->m_input_block->dims().size() == 3);
     auto &ds = this->m_input_block->dims();
-    const int rows = (ds[0] + m_size - 1) / m_size,
-        cols = (ds[1] + m_size - 1) / m_size,
-        channels = ds[2];
-    if (m_output_block->empty()){
+    const int rows = (ds[0] - m_size) / m_size + 1;
+    const int cols = (ds[1] - m_size) / m_size + 1;
+    const int channels = ds[2];
+
+    if (m_output_block->empty()) {
         m_output_block->resize(rows, cols, channels);
     }
+
     auto &ods = m_output_block->dims();
     CHECK(ods[0] == rows);
     CHECK(ods[1] == cols);
@@ -83,17 +85,17 @@ void max_pooling_layer::backward(int t) {
     for (int ch = 0; ch < channels; ++ch) {
         for (int r = 0; r < orows; ++r) {
             for (int c = 0; c < ocols; ++c) {
-                float err = oerror.at3(ch, r, c);
+                const float err = oerror.at3(ch, r, c);
                 const int idx = (int) max_index.at3(ch, r, c);
-                const int nrow = r*m_size + idx%m_size;
-                const int ncol = c*m_size + idx / m_size;
+                const int nrow = r * m_size + idx % m_size;
+                const int ncol = c * m_size + idx / m_size;
                 ierror.at3(ch, nrow, ncol) += err;
             }
         }
     }
 
-    m_max_history.pop_back();
     oerror.clear(0);
+    m_max_history.pop_back();
 }
 
 

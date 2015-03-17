@@ -29,7 +29,8 @@ network::network(const std::string& config, const std::string& plan) {
     for (auto key : dict){
         int k = atoi(key.first.c_str());
         CHECK(k >= 0);
-        m_label_dict[k] = key.second.get<string>();
+        string val = key.second.get<string>();
+        m_label_dict[k] = val;
     }
 
     CHECK(m_config.contains(plan));

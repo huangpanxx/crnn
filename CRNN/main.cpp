@@ -312,7 +312,20 @@ void test_network(const string& filename) {
             //recongnize
             int start_time = clock();
             predict_net.set_input(image);
-            array2d output = predict_net.forward();
+            array _output = predict_net.forward();
+
+            //get 2d output
+            array2d output(0, 0);
+            if (_output.dim() == 1) {
+                output = array2d(1, _output.size());
+                output.copy(_output);
+            }
+            else if (_output.dim() == 2) {
+                output = _output;
+            }
+            else{ CHECK(false); }
+
+            //translate
             string ans = "";
             for (int i = 0; i < output.rows(); ++i) {
                 int k = output.arg_max_row(i);
@@ -346,6 +359,7 @@ int main(int argc, char **argv) {
     //test_xor();
     //test_mlp();
     //test_omp();
+
     string model_file = "";
     if (argc == 2) {
         model_file = argv[1];

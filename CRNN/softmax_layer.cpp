@@ -41,6 +41,7 @@ layer_ptr create_softmax_layer(
     int output_id = (int) config.get("output").get<double>();
     auto input_block = bf.get_block(input_id);
     auto output_block = bf.get_block(output_id);
+
     return layer_ptr(new softmax_layer(input_block, output_block));
 }
 

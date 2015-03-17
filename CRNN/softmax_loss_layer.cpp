@@ -19,10 +19,6 @@ void softmax_loss_layer::setup_block() {
     CHECK(m_input_block->size() == m_label_block->dims()[1]);
 };
 
-void softmax_loss_layer::setup_params() {
-    this->m_loss = 0;
-}
-
 bool softmax_loss_layer::begin_seq() {
     this->m_output_history.clear();
     return true;
@@ -74,7 +70,6 @@ void softmax_loss_layer::backward(int t) {
 }
 
 void softmax_loss_layer::end_batch(int size) {
-    m_loss = m_loss_sum / m_loss_num;
     m_loss_sum = 0;
     m_loss_num = 0;
 }

@@ -11,7 +11,6 @@ public:
         std::shared_ptr<block> label_block);
 
     virtual void setup_block();
-    virtual void setup_params();
     virtual bool begin_seq();
     virtual bool forward(int t);
     virtual void backward(int t);
@@ -22,13 +21,18 @@ public:
         m_report = b;
     }
 
-    virtual float loss(){ return m_loss; }
+    virtual float loss(){ 
+        float loss = 0;
+        if (m_loss_num != 0){
+            loss = m_loss_sum / m_loss_num;
+        }
+        return loss;
+    }
 
 private:
     std::shared_ptr<block> m_input_block;
     std::shared_ptr<block> m_label_block;
     std::vector<array> m_output_history;
-    float m_loss;
     float m_loss_sum;
     int m_loss_num;
     bool m_report;
