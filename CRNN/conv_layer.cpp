@@ -131,33 +131,35 @@ void conv_layer::backward(int t) {
     array3d ierror = this->m_input_block->error();
 
 
-    const int rows = input.rows(), cols = input.cols(), channels = input.channels();
-    CHECK(m_weights.size() == oerror.channels());
-    const int orows = oerror.rows(), ocols = oerror.cols(), ochannels = oerror.channels();
+    if (this->enable_bp()) {
+        const int rows = input.rows(), cols = input.cols(), channels = input.channels();
+        CHECK(m_weights.size() == oerror.channels());
+        const int orows = oerror.rows(), ocols = oerror.cols(), ochannels = oerror.channels();
 
-    //for output point
-    OMP_FOR
-    for (int och = 0; och < ochannels; ++och) {
-        auto& w = m_weights[och];
-        auto& gw = m_grad_weights[och];
-        auto& gb = m_grad_bias.at(och);
+        //for output point
+        OMP_FOR
+        for (int och = 0; och < ochannels; ++och) {
+            auto& w = m_weights[och];
+            auto& gw = m_grad_weights[och];
+            auto& gb = m_grad_bias.at(och);
 
-        for (int r = 0; r < orows; ++r) {
-            for (int c = 0; c < ocols; ++c) {
-                float err = oerror.at3(och, r, c);
+            for (int r = 0; r < orows; ++r) {
+                for (int c = 0; c < ocols; ++c) {
+                    float err = oerror.at3(och, r, c);
 
-                //for input region
-                gb += err;
-                for (int ich = 0; ich < channels; ++ich){
-                    for (int dr = 0; dr < m_kernel_size; ++dr) {
-                        for (int dc = 0; dc < m_kernel_size; ++dc) {
-                            int nr = r * m_kernel_stride + dr;
-                            int nc = c * m_kernel_stride + dc;
-                            if (nr < rows && nc < cols) {
-                                //bp
-                                ierror.at3(ich, nr, nc) += err * w.at3(ich, dr, dc);
-                                //weight grad
-                                gw.at3(ich, dr, dc) += err * input.at3(ich, nr, nc);
+                    //for input region
+                    gb += err;
+                    for (int ich = 0; ich < channels; ++ich){
+                        for (int dr = 0; dr < m_kernel_size; ++dr) {
+                            for (int dc = 0; dc < m_kernel_size; ++dc) {
+                                int nr = r * m_kernel_stride + dr;
+                                int nc = c * m_kernel_stride + dc;
+                                if (nr < rows && nc < cols) {
+                                    //bp
+                                    ierror.at3(ich, nr, nc) += err * w.at3(ich, dr, dc);
+                                    //weight grad
+                                    gw.at3(ich, dr, dc) += err * input.at3(ich, nr, nc);
+                                }
                             }
                         }
                     }

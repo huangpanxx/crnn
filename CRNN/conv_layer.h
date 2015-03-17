@@ -19,7 +19,6 @@ public:
     virtual void backward(int t);
     virtual void end_batch(int size);
 
-
     std::vector<array3d> weights(){
         return m_weights;
     }

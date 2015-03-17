@@ -102,11 +102,13 @@ void inner_product_layer::backward(int t) {
     auto &error = m_output_block->error();
 
     //bp error to input blocks
-    for (int i = 0; i < (int) inputs.size(); ++i) {
-        auto& input_block = m_input_blocks[i];
-        auto& w = m_weights[i];
-        auto& ierror = input_block->error();
-        mul_addh(error, w, ierror);
+    if (this->enable_bp()) {
+        for (int i = 0; i < (int) inputs.size(); ++i) {
+            auto& input_block = m_input_blocks[i];
+            auto& w = m_weights[i];
+            auto& ierror = input_block->error();
+            mul_addh(error, w, ierror);
+        }
     }
 
     //grad bias

@@ -5,6 +5,7 @@ layer::layer() {
     m_learn_rate = 0.005f + (::rand() / RAND_MAX)*0.005f;
     m_momentum_decay = 0.9f;
     m_name = "";
+    m_enable_bp = true;
 }
 
 std::map<string, layer_factory_fn>& get_layer_fns(){

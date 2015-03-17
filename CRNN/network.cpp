@@ -164,6 +164,15 @@ void network::config_layer(picojson::value& val, layer_ptr& layer){
         float momentum = (float) val.get("momentum").get<double>();
         layer->set_momentum_decay(momentum);
     }
+
+    if (val.contains("enable_bp")){
+        bool b = val.get("enable_bp").get<bool>();
+        layer->set_enable_bp(b);
+        if (!b){
+            printf("layer %s disable bp.\n", layer->name().c_str());
+        }
+    }
+
     printf("layer %s, learn_rate = %.8f, momentum = %0.8f.\n",
         name.c_str(),
         layer->learn_rate(),

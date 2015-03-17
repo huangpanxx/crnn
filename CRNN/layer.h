@@ -26,9 +26,15 @@ public:
     std::string name(){ return m_name; }
     void set_name(const std::string name){ m_name = name; }
 
+    bool enable_bp() { return m_enable_bp; }
+    void set_enable_bp(bool b) {
+        m_enable_bp = b;
+    }
+
 private:
     float m_learn_rate;
     float m_momentum_decay;
+    bool m_enable_bp;
     std::string m_name;
 };
 
