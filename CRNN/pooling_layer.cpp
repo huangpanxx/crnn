@@ -76,18 +76,18 @@ void max_pooling_layer::backward(int t) {
     array3d oerror = m_output_block->error();
     array3d ierror = m_input_block->error();
     array3d &max_index = this->m_max_history.back();
-    int orows = oerror.rows(), ocols = oerror.cols(), channels = oerror.channels();
+    const int orows = oerror.rows(), 
+        ocols = oerror.cols(), channels = oerror.channels();
 
     OMP_FOR
     for (int ch = 0; ch < channels; ++ch) {
         for (int r = 0; r < orows; ++r) {
             for (int c = 0; c < ocols; ++c) {
                 float err = oerror.at3(ch, r, c);
-                int idx = (int)max_index.at3(ch, r, c);
-                ierror.at3(
-                    ch, 
-                    r * m_size + idx % m_size,
-                    c * m_size + idx / m_size) += err;
+                const int idx = (int) max_index.at3(ch, r, c);
+                const int nrow = r*m_size + idx%m_size;
+                const int ncol = c*m_size + idx / m_size;
+                ierror.at3(ch, nrow, ncol) += err;
             }
         }
     }

@@ -86,7 +86,7 @@ std::vector<array> read_arrays_from_stream(std::istream& is) {
 
 void write_str_to_stream(std::ostream& os, const std::string& s) {
     write_magic_number(os);
-    write_val_to_stream<int>(os, s.size());
+    write_val_to_stream<int>(os, (int)s.size());
     for (int i = 0; i < (int) s.size(); ++i){
         write_val_to_stream(os, s[i]);
     }
