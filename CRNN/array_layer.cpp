@@ -77,7 +77,7 @@ void array_layer::move_to_next_batch() {
 }
 
 void array_layer::save(std::ostream& os) {
-    write_val_to_stream(os, m_index);
+    write_val_to_stream(os, (int)m_index);
 }
 
 void array_layer::load(std::istream& is) {
