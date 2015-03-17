@@ -9,6 +9,8 @@ max_pooling_layer::max_pooling_layer(block_ptr input_block, block_ptr output_blo
 
 bool max_pooling_layer::begin_seq() {
     this->m_max_history.clear();
+    this->m_output_block->signal().clear(0);
+    this->m_output_block->error().clear(0);
     return true;
 }
 

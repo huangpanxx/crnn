@@ -25,7 +25,7 @@ array_layer::array_layer(
 }
 
 bool array_layer::begin_seq() {
-   auto max_index = this->m_samples.size() * this->m_iter * m_loop;
+   int max_index = (int)this->m_samples.size() * this->m_iter * m_loop;
    CHECK(max_index > 0);
    bool ok = m_index + 1 < max_index;
    if (ok) {
