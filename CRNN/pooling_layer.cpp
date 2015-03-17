@@ -17,8 +17,8 @@ bool max_pooling_layer::begin_seq() {
 void max_pooling_layer::setup_block() {
     CHECK(this->m_input_block->dims().size() == 3);
     auto &ds = this->m_input_block->dims();
-    const int rows = (ds[0] - m_size) / m_size + 1;
-    const int cols = (ds[1] - m_size) / m_size + 1;
+    const int rows = (ds[0] + m_size - 1) / m_size;
+    const int cols = (ds[1] + m_size - 1) / m_size;
     const int channels = ds[2];
 
     if (m_output_block->empty()) {
