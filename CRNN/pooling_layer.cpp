@@ -82,7 +82,10 @@ void max_pooling_layer::backward(int t) {
             for (int c = 0; c < ocols; ++c) {
                 float err = oerror.at3(ch, r, c);
                 int idx = (int)max_index.at3(ch, r, c);
-                ierror.at3(ch, r * m_size + idx % m_size, c * m_size + idx / m_size) += err;
+                ierror.at3(
+                    ch, 
+                    r * m_size + idx % m_size,
+                    c * m_size + idx / m_size) += err;
             }
         }
     }
