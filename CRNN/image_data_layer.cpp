@@ -20,7 +20,7 @@ vector<array_sample> load_images(const string& dirname, const string& label_file
             if (!line.empty())
                 break;
         }
-        int pos = line.find(' ');
+        auto pos = line.find(' ');
         if (pos <= 0) continue;
         string file_name = line.substr(0, pos);
         string label_str = line.substr(pos);
