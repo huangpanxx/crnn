@@ -52,15 +52,26 @@ network::network(const std::string& config, const std::string& plan) {
     //create layers
     CHECK(plan_config.contains("setup_block"));
     auto setup_block_seq = get_layers(plan_config.get("setup_block"));
-    CHECK(plan_config.contains("setup_params"));
-    auto setup_params_seq = get_layers(plan_config.get("setup_params"));
-    CHECK(plan_config.contains("begin_seq"));
-    this->m_beg_layer_seq = get_layers(plan_config.get("begin_seq"));
-    CHECK(plan_config.contains("activation"));
-    auto arr = plan_config.get("activation").get<picojson::array>();
-    for (auto seq : arr) {
-        auto layers = get_layers(seq);
-        m_activate_layer_seq.push_back(layers);
+
+    auto setup_params_seq = setup_block_seq;
+    if (plan_config.contains("setup_params")){
+        auto setup_params_seq = get_layers(plan_config.get("setup_params"));
+    }
+
+    this->m_beg_layer_seq = setup_block_seq;
+    if (plan_config.contains("begin_seq")){
+        this->m_beg_layer_seq = get_layers(plan_config.get("begin_seq"));
+    }
+
+    if (plan_config.contains("activation")) {
+        auto arr = plan_config.get("activation").get<picojson::array>();
+        for (auto seq : arr) {
+            auto layers = get_layers(seq);
+            m_activate_layer_seq.push_back(layers);
+        }
+    }
+    else {
+        m_activate_layer_seq.push_back(setup_block_seq);
     }
 
     //train(loss data)

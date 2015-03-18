@@ -14,7 +14,7 @@ multi_softmax_loss_layer::multi_softmax_loss_layer(
 
 void multi_softmax_loss_layer::setup_block() {
     CHECK((int)this->m_label_block->dims().size() == 2);
-    CHECK(this->m_label_block->dims()[0] == (int)this->m_input_blocks.size());
+    CHECK(this->m_label_block->dims()[0] >= (int)this->m_input_blocks.size());
     for (auto& block : m_input_blocks) {
         CHECK(block->size() == m_label_block->dims()[1]);
     }
@@ -42,7 +42,7 @@ bool multi_softmax_loss_layer::forward(int t) {
     m_output_history.push_back(outputs);
 
     array2d label = m_label_block->signal();
-    const int label_num = label.rows();
+    const int label_num = (int) m_input_blocks.size();
     const int label_size = label.cols();
 
 
@@ -62,7 +62,7 @@ bool multi_softmax_loss_layer::forward(int t) {
 
 void multi_softmax_loss_layer::backward(int t){
     array2d label = m_label_block->signal();
-    const int label_num = label.rows();
+    const int label_num = (int) m_input_blocks.size();
     const int label_size = label.cols();
     const auto &outputs = m_output_history.back();
 

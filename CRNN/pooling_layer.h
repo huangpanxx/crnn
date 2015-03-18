@@ -5,7 +5,10 @@
 
 class max_pooling_layer : public layer {
 public:
-    max_pooling_layer(block_ptr input_block, block_ptr output_block, int size);
+    max_pooling_layer(
+        block_ptr input_block, 
+        block_ptr output_block,
+        int size, int stride);
 
     virtual void setup_block();
 
@@ -18,6 +21,7 @@ private:
     block_ptr m_output_block;
     std::vector<array3d> m_max_history;
     int m_size;
+    int m_stride;
 };
 
 //class mean_pooling_layer : public layer{

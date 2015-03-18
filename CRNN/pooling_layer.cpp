@@ -1,9 +1,12 @@
 #include "pooling_layer.h"
+using namespace std;
 
-max_pooling_layer::max_pooling_layer(block_ptr input_block, block_ptr output_block, int size){
+max_pooling_layer::max_pooling_layer(
+    block_ptr input_block, block_ptr output_block, int size,int stride){
     this->m_input_block = input_block;
     this->m_output_block = output_block;
     this->m_size = size;
+    this->m_stride = stride;
     CHECK(m_size >= 2);
 }
 
@@ -17,8 +20,8 @@ bool max_pooling_layer::begin_seq() {
 void max_pooling_layer::setup_block() {
     CHECK(this->m_input_block->dims().size() == 3);
     auto &ds = this->m_input_block->dims();
-    const int rows = (ds[0] + m_size - 1) / m_size;
-    const int cols = (ds[1] + m_size - 1) / m_size;
+    const int rows = (ds[0] - m_size) / m_stride + 1;
+    const int cols = (ds[1] - m_size) / m_stride + 1;
     const int channels = ds[2];
 
     if (m_output_block->empty()) {
@@ -45,7 +48,7 @@ bool max_pooling_layer::forward(int t) {
         for (int r = 0; r < orows; ++r) {
             for (int c = 0; c < ocols; ++c) {
                 //left top corner
-                const int br = r * m_size, bc = c * m_size;
+                const int br = r * m_stride, bc = c * m_stride;
 
                 //first
                 float mmax = input.at3(ch, br, bc);
@@ -81,14 +84,15 @@ void max_pooling_layer::backward(int t) {
     const int orows = oerror.rows(), 
         ocols = oerror.cols(), channels = oerror.channels();
 
+
     OMP_FOR
     for (int ch = 0; ch < channels; ++ch) {
         for (int r = 0; r < orows; ++r) {
             for (int c = 0; c < ocols; ++c) {
                 const float err = oerror.at3(ch, r, c);
                 const int idx = (int) max_index.at3(ch, r, c);
-                const int nrow = r * m_size + idx % m_size;
-                const int ncol = c * m_size + idx / m_size;
+                const int nrow = r * m_stride + idx % m_size;
+                const int ncol = c * m_stride + idx / m_size;
                 ierror.at3(ch, nrow, ncol) += err;
             }
         }
@@ -109,7 +113,8 @@ layer_ptr create_max_pooling_layer(const picojson::value& config,
     auto input_block = bf.get_block(input_block_id);
     auto output_block = bf.get_block(output_block_id);
     int size = (int)config.get("size").get<double>();
-    return layer_ptr(new max_pooling_layer(input_block, output_block, size));
+    int stride = (int)config.get("stride").get<double>();
+    return layer_ptr(new max_pooling_layer(input_block, output_block, size, stride));
 }
 
 REGISTER_LAYER(max_pooling, create_max_pooling_layer)

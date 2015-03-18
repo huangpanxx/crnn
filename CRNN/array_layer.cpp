@@ -22,6 +22,13 @@ array_layer::array_layer(
         CHECK(cmp_vec(data_dims, sample.data().dims()));
         CHECK(cmp_vec(label_dims, sample.label().dims()));
     }
+
+    cout << "data dims:";
+    for (int i = 0; i < data_dims.size(); ++i){
+        if (i) cout << ",";
+        cout << data_dims[i];
+    }
+    cout << endl;
 }
 
 bool array_layer::begin_seq() {
