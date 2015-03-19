@@ -24,7 +24,7 @@ array_layer::array_layer(
     }
 
     cout << "data dims:";
-    for (int i = 0; i < data_dims.size(); ++i){
+    for (int i = 0; i < (int)data_dims.size(); ++i){
         if (i) cout << ",";
         cout << data_dims[i];
     }
