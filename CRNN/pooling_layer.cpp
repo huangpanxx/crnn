@@ -113,7 +113,10 @@ layer_ptr create_max_pooling_layer(const picojson::value& config,
     auto input_block = bf.get_block(input_block_id);
     auto output_block = bf.get_block(output_block_id);
     int size = (int)config.get("size").get<double>();
-    int stride = (int)config.get("stride").get<double>();
+    int stride = size;
+    if (config.contains("stride")){
+       stride = (int) config.get("stride").get<double>();
+    }
     return layer_ptr(new max_pooling_layer(input_block, output_block, size, stride));
 }
 
