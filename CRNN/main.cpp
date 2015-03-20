@@ -359,6 +359,7 @@ int main(int argc, char **argv) {
     //test_xor();
     //test_mlp();
     //test_omp();
+    auto img = imread("C:/Users/root/Desktop/asd.png", 100, 100);
 
     string model_file = "";
     if (argc == 2) {

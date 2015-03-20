@@ -5,11 +5,37 @@ extern "C" {
     typedef unsigned char stbi_uc;
     stbi_uc *stbi_load(char const *filename, int *x, int *y, int *comp, int req_comp);
     void  stbi_image_free(void *retval_from_stbi_load);
+
+    int stbir_resize_uint8(const unsigned char *input_pixels, int input_w, int input_h,
+        int input_stride_in_bytes, unsigned char *output_pixels, int output_w, int output_h,
+        int output_stride_in_bytes, int num_channels);
 }
 
-array3d imread(const std::string& path){
-    int w, h, n;
-    unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 3);
+//array3d imread(const std::string& path, int width, int height) {
+//    int w, h, n = 3;
+//    unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 0);
+//    CHECK(data);
+//    unsigned char* newdata = new unsigned char[width * height * n];
+//    int ret = stbir_resize_uint8(data, w, h, 0, newdata, width, height, 0, 3);
+//    CHECK(ret);
+//    array3d image(h, width, height);
+//    for (int x = 0; x < width; ++x) {
+//        for (int y = 0; y < height; ++y) {
+//            unsigned char* pt = newdata + n * (y * width + x);
+//            for (int ch = 0; ch < n; ++ch) {
+//                float val = pt[ch] / 255.0f;
+//                image.at3(ch, y, x) = val;
+//            }
+//        }
+//    }
+//    stbi_image_free(data);
+//    delete [] newdata;
+//    return image;
+//}
+
+array3d imread(const std::string& path) {
+    int w, h, n = 3;
+    unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 0);
     CHECK(data);
     array3d image(h, w, n);
     for (int x = 0; x < w; ++x) {
@@ -37,10 +63,10 @@ void read_magic_number(std::istream& is){
 
 void write_array_to_stream(std::ostream& os, const array& arr) {
     write_magic_number(os);
-    write_val_to_stream(os, (int)arr.size());
-    write_val_to_stream(os, (int)arr.dim());
+    write_val_to_stream(os, (int) arr.size());
+    write_val_to_stream(os, (int) arr.dim());
     for (int i = 0; i < arr.dim(); ++i) {
-        write_val_to_stream(os, (int)arr.dim(i));
+        write_val_to_stream(os, (int) arr.dim(i));
     }
     for (int i = 0; i < arr.size(); ++i) {
         write_val_to_stream<float>(os, arr.at(i));
@@ -66,7 +92,7 @@ array read_array_from_stream(std::istream& is) {
 
 void write_arrays_to_stream(std::ostream& os, const std::vector<array>& arrs) {
     write_magic_number(os);
-    write_val_to_stream(os, (int)arrs.size());
+    write_val_to_stream(os, (int) arrs.size());
     for (int i = 0; i < (int) arrs.size(); ++i){
         write_array_to_stream(os, arrs[i]);
     }
@@ -86,7 +112,7 @@ std::vector<array> read_arrays_from_stream(std::istream& is) {
 
 void write_str_to_stream(std::ostream& os, const std::string& s) {
     write_magic_number(os);
-    write_val_to_stream<int>(os, (int)s.size());
+    write_val_to_stream<int>(os, (int) s.size());
     for (int i = 0; i < (int) s.size(); ++i){
         write_val_to_stream(os, s[i]);
     }
@@ -125,12 +151,12 @@ std::map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
 void save_layers(std::ostream& os,
     const std::map<std::string, std::shared_ptr<layer> >& layers){
     for (auto &pair : layers) {
-        int head_pos = (int)os.tellp();
+        int head_pos = (int) os.tellp();
         write_val_to_stream<int>(os, 0);
         auto layer = pair.second;
-        write_str_to_stream(os,layer->name());
+        write_str_to_stream(os, layer->name());
         layer->save(os);
-        int tail_pos = (int)os.tellp();
+        int tail_pos = (int) os.tellp();
         os.seekp(head_pos);
         write_val_to_stream<int>(os, tail_pos);
         os.seekp(tail_pos);
@@ -190,7 +216,7 @@ void softmax_normalize(const array& src, array& dst) {
     assert(src.size() == dst.size());
     int sz = src.size();
     const float mmax = src.max();
-OMP_FOR
+    OMP_FOR
     for (int i = 0; i < sz; ++i) {
         dst.at(i) = exp(src.at(i) - mmax);
     }
@@ -203,7 +229,7 @@ void softmax_normalize(const array& src, array2d& dst, int row){
     int sz = src.size();
     const float mmax = src.max();
     //exp
-OMP_FOR
+    OMP_FOR
     for (int i = 0; i < sz; ++i) {
         dst.at2(row, i) = exp(src.at(i) - mmax);
     }
@@ -213,7 +239,7 @@ OMP_FOR
         ssum += dst.at2(row, i);
     }
     //normalize
-OMP_FOR
+    OMP_FOR
     for (int i = 0; i < sz; ++i){
         dst.at2(row, i) /= ssum;
     }

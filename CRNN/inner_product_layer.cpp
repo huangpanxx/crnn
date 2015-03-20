@@ -32,7 +32,8 @@ inner_product_layer::inner_product_layer(
 void inner_product_layer::setup_block() {
     if (this->m_output_block->empty()) {
         this->m_output_block->resize(this->m_output_num);
-    } else {
+    }
+    else {
         CHECK(this->m_output_block->size() == this->m_output_num);
     }
     this->m_output_block->error().clear(0);
@@ -43,7 +44,8 @@ void inner_product_layer::setup_params(){
     if (this->m_bias.size() == 0) {
         this->m_bias = array(m_output_num);
         this->m_bias.rand(-0.5f, 0.5f);
-    } else {
+    }
+    else {
         CHECK(this->m_bias.size() == m_output_num);
     }
 
@@ -60,7 +62,8 @@ void inner_product_layer::setup_params(){
             auto& w = m_weights[i];
             CHECK(w.rows() == m_output_num);
             CHECK(w.cols() == block->size());
-        } else {
+        }
+        else {
             array2d w(m_output_num, block->size());
             w.rand(-bound, bound);
             this->m_weights.push_back(w);
@@ -119,7 +122,7 @@ void inner_product_layer::backward(int t) {
         auto& input = inputs[i];
         auto& gw = m_grad_weights[i];
         int esz = error.size(), isz = input.size();
-OMP_FOR
+        OMP_FOR
         for (int j = 0; j < esz; ++j) {
             for (int k = 0; k < isz; ++k) {
                 gw.at2(j, k) += input.at(k) * error.at(j);

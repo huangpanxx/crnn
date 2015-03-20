@@ -36,7 +36,7 @@ float* alloc_array(int size) {
     g_mem_mutex.lock();
     float* pt = 0;
     g_active_arrays += 1;
-    for (int i = 0; i < (int)g_arrays.size(); ++i) {
+    for (int i = 0; i < (int) g_arrays.size(); ++i) {
         auto &array = g_arrays[i];
         //bigger than size and less than 2 times size
         if (!array.occupied && array.size >= size && array.size <= size * 2) {
@@ -51,7 +51,7 @@ float* alloc_array(int size) {
         mem_array array(size, pt);
         array.occupied = true;
         //cout << "new array, size = " << array.size << endl;
-        for (int i = 0; i < (int)g_arrays.size() + 1; ++i) {
+        for (int i = 0; i < (int) g_arrays.size() + 1; ++i) {
             if (i == g_arrays.size() || g_arrays[i].size >= size) {
                 g_arrays.insert(g_arrays.begin() + i, array);
                 break;
@@ -68,11 +68,11 @@ void free_array(float* pt) {
     auto& g_arrays = get_mem_arrays();
     g_mem_mutex.lock();
     g_active_arrays -= 1;
-    for (int i = 0; i < (int)g_arrays.size(); ++i) {
+    for (int i = 0; i < (int) g_arrays.size(); ++i) {
         auto &array = g_arrays[i];
         if (array.pointer == pt) {
             //cout << "free array, size = " << array.size 
-                //<<", active = " << g_active_arrays << endl;
+            //<<", active = " << g_active_arrays << endl;
             array.occupied = false;
             break;
         }
@@ -101,13 +101,13 @@ array::array(const std::vector<int> dims) {
     assert(dims.size() != 0);
     assert(dims.size() < 20);
     int size = 1;
-    for (int i = 0; i < (int)dims.size(); ++i){
+    for (int i = 0; i < (int) dims.size(); ++i){
         size *= dims[i];
     }
     init(size);
-    this->m_pmeta->dim = (int)dims.size();
+    this->m_pmeta->dim = (int) dims.size();
     for (int i = 0; i < this->m_pmeta->dim; ++i){
-        this->m_pmeta->dimk[i] = (int)dims[i];
+        this->m_pmeta->dimk[i] = (int) dims[i];
     }
     copy_meta();
 }
@@ -117,7 +117,7 @@ array::array(const std::vector<int> dims) {
 void array::init(int size) {
     const int offset = sizeof(array_meta) / sizeof(float) +1;
     float* pmem = alloc_array(size + offset);
-    this->m_pmeta = (array_meta*)pmem;
+    this->m_pmeta = (array_meta*) pmem;
     this->m_pmeta->data = pmem + offset;
     this->m_pmeta->id = array::new_id();
     this->m_pmeta->size = size;

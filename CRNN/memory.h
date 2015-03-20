@@ -21,7 +21,7 @@ public:
 
     virtual ~array();
 
-    inline int dim() const { 
+    inline int dim() const {
         return this->m_dim;
     }
 

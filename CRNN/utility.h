@@ -7,6 +7,8 @@
 
 array3d imread(const std::string& path);
 
+//array3d imread(const std::string& path, int width, int height);
+
 template<class T>
 void write_val_to_stream(std::ostream& os, const T t) {
     os.write((char*) &t, sizeof(T));
@@ -28,7 +30,7 @@ void write_str_to_stream(std::ostream& os, const std::string& s);
 
 std::string read_str_from_stream(std::istream& is);
 
-template<class T1,class T2>
+template<class T1, class T2>
 std::vector<T1> convert_arrays(const std::vector<T2>& arrs){
     std::vector<T1> v;
     for (int i = 0; i < (int) arrs.size(); ++i)
@@ -51,7 +53,7 @@ std::map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
 void save_layers(std::ostream& os,
     const std::map<std::string, std::shared_ptr<layer> >& layers);
 
-void load_layers(std::istream& is, 
+void load_layers(std::istream& is,
     const std::map<std::string, std::shared_ptr<layer> >& layers);
 
 std::string read_file(const std::string& file_name);
