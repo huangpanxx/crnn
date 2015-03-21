@@ -322,6 +322,11 @@ public:
     array& signal(){ return m_signal; }
     array& error(){ return m_error; }
 
+    void set_signal(array& src) {
+        CHECK(cmp_array_dim(src, signal()));
+        this->m_signal = src;
+    }
+
     array& new_signal() {
         m_signal = m_signal.clone(false);
         return m_signal;
