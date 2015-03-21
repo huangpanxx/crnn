@@ -74,7 +74,7 @@ void test_mlp(){
         new image_data_layer(
         "data",
         "label.txt",
-        data_block, label_block, 15, 10000, 100));
+        data_block, label_block, 15, 10000, 100, -1, -1));
 
     shared_ptr<inner_product_layer> fc1_layer(
         new inner_product_layer(200, data_block , fc1_block));
@@ -304,10 +304,18 @@ void test_network(const string& filename) {
     else{
         network predict_net(json, "predict");
 
-        while (true){
+        while (true) {
             //read image
             auto file_name = promote_file_name("image file");
             auto image = imread(file_name);
+            auto dims = predict_net.input_dims();
+
+            //resize image
+            CHECK(dims.size() == 3 && dims[2] == 3);
+            int width = dims[1], height = dims[0];
+            if (width != image.cols() || height != image.rows()){
+                image = resize(image, width, height);
+            }
 
             //recongnize
             int start_time = clock();
@@ -359,7 +367,6 @@ int main(int argc, char **argv) {
     //test_xor();
     //test_mlp();
     //test_omp();
-    auto img = imread("C:/Users/root/Desktop/asd.png", 100, 100);
 
     string model_file = "";
     if (argc == 2) {

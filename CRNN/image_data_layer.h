@@ -10,7 +10,8 @@ public:
         const std::string& label_file,
         std::shared_ptr<block> data,
         std::shared_ptr<block> label,
-        int batch, int iter,int loop);
+        int batch, int iter, int loop, 
+        int width = -1, int height = -1);
 };
 
 #endif

@@ -5,44 +5,51 @@ extern "C" {
     typedef unsigned char stbi_uc;
     stbi_uc *stbi_load(char const *filename, int *x, int *y, int *comp, int req_comp);
     void  stbi_image_free(void *retval_from_stbi_load);
-
-    int stbir_resize_uint8(const unsigned char *input_pixels, int input_w, int input_h,
-        int input_stride_in_bytes, unsigned char *output_pixels, int output_w, int output_h,
-        int output_stride_in_bytes, int num_channels);
 }
 
-//array3d imread(const std::string& path, int width, int height) {
-//    int w, h, n = 3;
-//    unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 0);
-//    CHECK(data);
-//    unsigned char* newdata = new unsigned char[width * height * n];
-//    int ret = stbir_resize_uint8(data, w, h, 0, newdata, width, height, 0, 3);
-//    CHECK(ret);
-//    array3d image(h, width, height);
-//    for (int x = 0; x < width; ++x) {
-//        for (int y = 0; y < height; ++y) {
-//            unsigned char* pt = newdata + n * (y * width + x);
-//            for (int ch = 0; ch < n; ++ch) {
-//                float val = pt[ch] / 255.0f;
-//                image.at3(ch, y, x) = val;
-//            }
-//        }
-//    }
-//    stbi_image_free(data);
-//    delete [] newdata;
-//    return image;
-//}
+array3d resize(const array3d& src, int width, int height) {
+    array3d dst(height, width, src.channels());
+    for (int ch = 0; ch < dst.channels(); ++ch) {
+        OMP_FOR
+        for (int r = 0; r < dst.rows(); ++r) {
+            for (int c = 0; c < dst.cols(); ++c) {
+                float fr = float(r) / dst.rows() * src.rows();
+                float fc = float(c) / dst.cols() * src.cols();
+
+                int nr1 = int(fr);
+                int nc1 = int(fc);
+                int nr2 = min(nr1 + 1, src.rows() - 1);
+                int nc2 = min(nc1 + 1, src.cols() - 1);
+
+                float f1 = src.at3(ch, nr1, nc1), f2 = src.at3(ch, nr1, nc2);
+                float f3 = src.at3(ch, nr2, nc1), f4 = src.at3(ch, nr2, nc2);
+
+                float f = f1*(nr1 + 1 - fr)*(nc1 + 1 - fc)
+                    + f2*(nr1 + 1 - fr)*(fc - nc1)
+                    + f3*(fr - nr1)*(nc1 + 1 - fc)
+                    + f4*(fr - nr1)*(fc - nc1);
+
+                dst.at3(ch, r, c) = f;
+            }
+        }
+    }
+    return dst;
+}
 
 array3d imread(const std::string& path) {
     int w, h, n = 3;
     unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 0);
     CHECK(data);
-    array3d image(h, w, n);
+    CHECK(n == 1 || n == 3 || n == 4);
+    array3d image(h, w, 3); //rgb
     for (int x = 0; x < w; ++x) {
         for (int y = 0; y < h; ++y) {
             unsigned char* pt = data + n * (y * w + x);
-            for (int ch = 0; ch < n; ++ch) {
-                float val = pt[ch] / 255.0f;
+            for (int ch = 0; ch < 3; ++ch) {
+                float val = 0;
+                if (n == 1) { val = pt[0] / 255.0f; }
+                else if (n == 3) { val = pt[ch] / 255.0f; }
+                else if (n == 4) { val = pt[ch] * pt[3] / (255.0f * 255.0f); }
                 image.at3(ch, y, x) = val;
             }
         }

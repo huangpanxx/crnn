@@ -1,84 +1,85 @@
+#include "common.h"
 #include "memory.h"
+#include <unordered_map>
 #include <mutex>
+#include <stack>
 using namespace std;
 
-struct mem_array {
-    mem_array(int size, float* pointer) {
-        this->size = size;
-        this->pointer = pointer;
-        this->occupied = false;
-    }
-    int size;
-    float* pointer;
-    bool occupied;
-};
-
-mutex& get_mem_mutex(){
+//global mutex
+inline mutex& get_mem_mutex() {
     static mutex mem_mutex;
     return mem_mutex;
 }
 
-vector<mem_array>& get_mem_arrays(){
-    static vector<mem_array> mem_arrays;
-    return mem_arrays;
+//pointer -> size
+inline unordered_map<float*, long>& get_allocated_mem() {
+    static unordered_map<float*, long> map;
+    return map;
 }
 
-int &get_active_arrays(){
-    static int active_arrays = 0;
-    return active_arrays;
+//size->pointer
+inline unordered_map<long, stack<float*> > &get_freed_mem() {
+    static unordered_map<long, stack<float*> > map;
+    return map;
 }
 
 
-float* alloc_array(int size) {
-    auto& g_mem_mutex = get_mem_mutex();
-    auto& g_active_arrays = get_active_arrays();
-    auto& g_arrays = get_mem_arrays();
-    g_mem_mutex.lock();
-    float* pt = 0;
-    g_active_arrays += 1;
-    for (int i = 0; i < (int) g_arrays.size(); ++i) {
-        auto &array = g_arrays[i];
-        //bigger than size and less than 2 times size
-        if (!array.occupied && array.size >= size && array.size <= size * 2) {
-            pt = array.pointer;
-            array.occupied = true;
-            //cout << "reuse array, size = " << size << ", actual = "<< array.size << endl;
-            break;
-        }
+float* alloc_array(long size) {
+    //lock
+    auto& mutex = get_mem_mutex();
+    mutex.lock();
+
+    //get freed block
+    auto& map = get_freed_mem();
+    auto& it = map.find(size);
+
+    if (it == map.end() || it->second.size() == 0){
+        //no freed block
+        auto pt = new float[size];
+        auto& am = get_allocated_mem();
+        am[pt] = size;
+        //return new block
+        mutex.unlock();
+        return pt;
     }
-    if (0 == pt) {
-        pt = new float[size];
-        mem_array array(size, pt);
-        array.occupied = true;
-        //cout << "new array, size = " << array.size << endl;
-        for (int i = 0; i < (int) g_arrays.size() + 1; ++i) {
-            if (i == g_arrays.size() || g_arrays[i].size >= size) {
-                g_arrays.insert(g_arrays.begin() + i, array);
-                break;
-            }
-        }
+    else {
+        //get and pop block
+        auto mem = it->second.top();
+        it->second.pop();
+
+        //return this block
+        mutex.unlock();
+        return mem;
     }
-    g_mem_mutex.unlock();
-    return pt;
 }
 
 void free_array(float* pt) {
-    auto& g_mem_mutex = get_mem_mutex();
-    auto& g_active_arrays = get_active_arrays();
-    auto& g_arrays = get_mem_arrays();
-    g_mem_mutex.lock();
-    g_active_arrays -= 1;
-    for (int i = 0; i < (int) g_arrays.size(); ++i) {
-        auto &array = g_arrays[i];
-        if (array.pointer == pt) {
-            //cout << "free array, size = " << array.size 
-            //<<", active = " << g_active_arrays << endl;
-            array.occupied = false;
-            break;
-        }
+    //lock
+    auto& mutex = get_mem_mutex();
+    mutex.lock();
+
+    //get block's size
+    auto& am = get_allocated_mem();
+    auto& it = am.find(pt);
+    assert(it != am.end());
+    long size = am[pt];
+
+    //get stack
+    auto& fm = get_freed_mem();
+
+    //init
+    if (!fm.count(size)) {
+        fm[size] = stack<float*>();
     }
-    g_mem_mutex.unlock();
+
+    //push into stack
+    fm[size].push(pt);
+
+    //unlock
+    mutex.unlock();
 }
+
+//=========================== array =============================
 
 int array::new_id(){
     auto& g_mem_mutex = get_mem_mutex();

@@ -168,7 +168,6 @@
     <ClCompile Include="softmax_loss_layer.cpp" />
     <ClCompile Include="solver.cpp" />
     <ClCompile Include="stb_image.c" />
-    <ClCompile Include="stb_image_resize.c" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

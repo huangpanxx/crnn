@@ -282,7 +282,6 @@ void network::set_input(const array& data){
     auto &input = this->m_block_factory.get_block(this->m_input_block_id);
     input->signal().copy(data);
     this->m_t = 0;
-
 }
 
 array network::forward(){

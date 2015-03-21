@@ -7,7 +7,7 @@
 
 array3d imread(const std::string& path);
 
-//array3d imread(const std::string& path, int width, int height);
+array3d resize(const array3d& src, int width, int height);
 
 template<class T>
 void write_val_to_stream(std::ostream& os, const T t) {

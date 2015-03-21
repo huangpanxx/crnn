@@ -26,6 +26,11 @@ public:
         return m_label_dict[k];
     }
 
+    //dims
+    std::vector<int> input_dims() const {
+        return m_input_dims;
+    }
+
 private:
     layer_ptr get_layer(const std::string &name);
     std::vector<layer_ptr> get_layers(const picojson::value& val);
