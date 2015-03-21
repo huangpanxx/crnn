@@ -3,7 +3,7 @@
 	"model" : "conv3-pool3-fc3-large.bin",
 	"save_epoch" : 10,
 	"input_dims" : [65,140,3],
-	"learn_rate" : 0.02,
+	"learn_rate" : 0.03,
 
 	"layers" : [
 		{
@@ -25,7 +25,7 @@
 			"output" : 1,
 			"kernel_size" : 6,
 			"kernel_num" : 32,
-			"kernel_stride" : 2,
+			"kernel_stride" : 1,
 			"enable_bp" : false
 		},
 	
@@ -52,11 +52,9 @@
 			"input" : 3,
 			"output" : 4,
 			"kernel_size" : 5,
-			"kernel_num" : 128,
+			"kernel_num" : 64,
 			"kernel_stride" : 1
 		},
-
-
 
 		{
 			"type" : "relu",
@@ -104,12 +102,15 @@
 		},
 
 		{
-			"type" : "inner_product",
-			"name" : "fc1",
-			"inputs" : [9],
+			"type" : "conv",
+			"name" : "conv4",
+			"input" : 9,
 			"output" : 10,
-			"output_num" : 4096
+			"kernel_size" : 3,
+			"kernel_num" : 512,
+			"kernel_stride" : 1
 		},
+
 
 		{
 			"type" : "relu",
@@ -117,22 +118,47 @@
 			"input" : 10,
 			"output" : 11,
 			"negtive_slope" : -1,
+			"share" : true
+		},
+
+		{
+			"type" : "max_pooling",
+			"name" : "pool4",
+			"input" : 11,
+			"output" : 12,
+			"size" : 2
+		},
+
+		{
+			"type" : "inner_product",
+			"name" : "fc1",
+			"inputs" : [9, 12],
+			"output" : 13,
+			"output_num" : 2048
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu5",
+			"input" : 13,
+			"output" : 14,
+			"negtive_slope" : -1,
 			"share" : false
 		},
 
 		{
 			"type" : "inner_product",
 			"name" : "fc2",
-			"inputs" : [11],
-			"output" : 12,
-			"output_num" : 4096
+			"inputs" : [14],
+			"output" : 15,
+			"output_num" : 2048
 		},
 
 		{
 			"type" : "relu",
-			"name" : "relu5",
-			"input" : 12,
-			"output" : 13,
+			"name" : "relu6",
+			"input" : 15,
+			"output" : 16,
 			"negtive_slope" : -1,
 			"share" : false
 		},
@@ -140,40 +166,40 @@
 		{
 			"type" : "inner_product",
 			"name" : "fc_1_1",
-			"inputs" : [13],
-			"output" : 14,
-			"output_num" : 2048
+			"inputs" : [16],
+			"output" : 17,
+			"output_num" : 1024
 		},
 
 		{
 			"type" : "inner_product",
 			"name" : "fc_1_2",
-			"inputs" : [13],
-			"output" : 15,
-			"output_num" : 2048
+			"inputs" : [16],
+			"output" : 18,
+			"output_num" : 1024
 		},
 
 		{
 			"type" : "inner_product",
 			"name" : "fc_1_3",
-			"inputs" : [13],
-			"output" : 16,
-			"output_num" : 2048
+			"inputs" : [16],
+			"output" : 19,
+			"output_num" : 1024
 		},
 
 		{
 			"type" : "inner_product",
 			"name" : "fc_1_4",
-			"inputs" : [13],
-			"output" : 17,
-			"output_num" : 2048
+			"inputs" : [16],
+			"output" : 20,
+			"output_num" : 1024
 		},
 
 		{
 			"type" : "relu",
 			"name" : "relu_2_1",
-			"input" : 14,
-			"output" : 18,
+			"input" : 17,
+			"output" : 21,
 			"negtive_slope" : -1,
 			"share" : false
 		},
@@ -182,8 +208,8 @@
 			"type" : "relu",
 			"name" : "relu_2_2",
 			"negtive_slope" : -1,
-			"input" : 15,
-			"output" : 19,
+			"input" : 18,
+			"output" : 22,
 			"share" : false
 		},
 
@@ -191,8 +217,8 @@
 			"type" : "relu",
 			"name" : "relu_2_3",
 			"negtive_slope" : -1,
-			"input" : 16,
-			"output" : 20,
+			"input" : 19,
+			"output" : 23,
 			"share" : false
 		},
 
@@ -200,52 +226,52 @@
 			"type" : "relu",
 			"name" : "relu_2_4",
 			"negtive_slope" : -1,
-			"input" : 17,
-			"output" : 21,
+			"input" : 20,
+			"output" : 24,
 			"share" : false
 		},
 
 		{
 			"type" : "inner_product",
 			"name" : "fc_3_1",
-			"inputs" : [18],
-			"output" : 22,
-			"output_num" : 36
-		},
-
-		{
-			"type" : "inner_product",
-			"name" : "fc_3_2",
-			"inputs" : [19],
-			"output" : 23,
-			"output_num" : 36
-		},
-		{
-			"type" : "inner_product",
-			"name" : "fc_3_3",
-			"inputs" : [20],
-			"output" : 24,
-			"output_num" : 36
-		},
-		{
-			"type" : "inner_product",
-			"name" : "fc_3_4",
 			"inputs" : [21],
 			"output" : 25,
 			"output_num" : 36
 		},
 
 		{
+			"type" : "inner_product",
+			"name" : "fc_3_2",
+			"inputs" : [22],
+			"output" : 26,
+			"output_num" : 36
+		},
+		{
+			"type" : "inner_product",
+			"name" : "fc_3_3",
+			"inputs" : [23],
+			"output" : 27,
+			"output_num" : 36
+		},
+		{
+			"type" : "inner_product",
+			"name" : "fc_3_4",
+			"inputs" : [24],
+			"output" : 28,
+			"output_num" : 36
+		},
+
+		{
 			"type" : "multi_softmax_loss",
 			"name" : "multi_softmax_loss",
-			"inputs" : [22, 23, 24, 25],
+			"inputs" : [25, 26, 27, 28],
 			"label" : -1
 		},
 
 		{
 			"type" : "multi_softmax",
 			"name" : "multi_softmax",
-			"inputs" : [22, 23, 24, 25],
+			"inputs" : [25, 26, 27, 28],
 			"output" : 100
 		}
 	],
@@ -261,16 +287,15 @@
 
 
 	"train" : {
-		"setup_block"  : ["image_data_layer","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","fc2","relu5","fc_1_1","fc_1_2","fc_1_3","fc_1_4","relu_2_1","relu_2_2","relu_2_3","relu_2_4","fc_3_1","fc_3_2","fc_3_3","fc_3_4","multi_softmax_loss"],
+		"setup_block"  : ["image_data_layer","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","conv4","relu4","pool4","fc1","relu5","fc2","relu6","fc_1_1","fc_1_2","fc_1_3","fc_1_4","relu_2_1","relu_2_2","relu_2_3","relu_2_4","fc_3_1","fc_3_2","fc_3_3","fc_3_4","multi_softmax_loss"],
 		"loss" : "multi_softmax_loss",
 		"data" : "image_data_layer",
 		"stop_loss" : 0.3
 	},
 
 	"predict" : {
-		"setup_block"  : ["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","fc2","relu5","fc_1_1","fc_1_2","fc_1_3","fc_1_4","relu_2_1","relu_2_2","relu_2_3","relu_2_4","fc_3_1","fc_3_2","fc_3_3","fc_3_4","multi_softmax"],
+		"setup_block"  : ["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","conv4","relu4","pool4","fc1","relu5","fc2","relu6","fc_1_1","fc_1_2","fc_1_3","fc_1_4","relu_2_1","relu_2_2","relu_2_3","relu_2_4","fc_3_1","fc_3_2","fc_3_3","fc_3_4","multi_softmax"],
 		"input" : 0,
 		"output" : 100
 	}
-	
 }
