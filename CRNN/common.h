@@ -38,6 +38,12 @@ inline void print_check(const char* msg, const char* filename, int line) {
 }
 
 #define CHECK(_Expression) \
-    (void)((!!(_Expression)) || (print_check(#_Expression,__FILE__, __LINE__), 0) )
+    (void)((!!(_Expression)) || (print_check(#_Expression,__FILE__, __LINE__), 0))
+
+inline void TIME(std::string info, std::function<void()> f){
+    clock_t start = clock();
+    f();
+    std::cout << info << ":" << clock() - start << std::endl;
+}
 
 #endif
