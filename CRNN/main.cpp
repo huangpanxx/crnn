@@ -367,6 +367,7 @@ int main(int argc, char **argv) {
     //test_xor();
     //test_mlp();
     //test_omp();
+    //cout << (int) (2147483648) << endl;
 
     string model_file = "";
     if (argc == 2) {

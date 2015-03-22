@@ -3,6 +3,17 @@
 
 #include "common.h"
 
+inline bool cmp_vec(const std::vector<int> &a, const std::vector<int> &b){
+    if (a.size() != b.size()){
+        return false;
+    }
+    for (int i = 0; i < (int) a.size(); ++i){
+        if (a[i] != b[i])
+            return false;
+    }
+    return true;
+}
+
 struct array_meta {
     float* data;
     int counter;
@@ -322,8 +333,8 @@ public:
     array& signal(){ return m_signal; }
     array& error(){ return m_error; }
 
-    void set_signal(array& src) {
-        CHECK(cmp_array_dim(src, signal()));
+    inline void set_signal(array& src) {
+        CHECK(cmp_vec(src.dims(), m_signal.dims()));
         this->m_signal = src;
     }
 
@@ -371,16 +382,7 @@ private:
     std::map<int, block_ptr> m_cache;
 };
 
-inline bool cmp_vec(const std::vector<int> &a, const std::vector<int> &b){
-    if (a.size() != b.size()){
-        return false;
-    }
-    for (int i = 0; i < (int) a.size(); ++i){
-        if (a[i] != b[i])
-            return false;
-    }
-    return true;
-}
+
 
 inline bool cmp_array_dim(const array& a, const array& b){
     if (a.dim() != b.dim()) return false;
