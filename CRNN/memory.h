@@ -290,6 +290,45 @@ inline void mul_addh(const array& a, const array2d&b, array& c){
     }
 }
 
+inline void mul_wise(const array& a, const array& b, array& c){
+    assert(a.size() == b.size());
+    assert(a.size() == c.size());
+    const int size = a.size();
+    OMP_FOR
+    for (int i = 0; i < size; ++i) {
+        c.at(i) = a.at(i) * b.at(i);
+    }
+}
+
+inline void mul_wise_add(const array& a, const array& b, array& c){
+    assert(a.size() == b.size());
+    assert(a.size() == c.size());
+    const int size = a.size();
+    OMP_FOR
+    for (int i = 0; i < size; ++i) {
+        c.at(i) += a.at(i) * b.at(i);
+    }
+}
+
+inline void mul(const array& src, float factor, array& dst){
+    assert(src.size() == dst.size());
+    const int size = src.size();
+    OMP_FOR
+    for (int i = 0; i < size; ++i) {
+        dst.at(i) = src.at(i) * factor;
+    }
+}
+
+inline void mul_add(const array& src, float factor, array& dst){
+    assert(src.size() == dst.size());
+    const int size = src.size();
+    OMP_FOR
+    for (int i = 0; i < size; ++i) {
+        dst.at(i) += src.at(i) * factor;
+    }
+}
+
+
 inline void add_to(const array& src, array& dst){
     assert(src.size() == dst.size());
     const int sz = src.size();
