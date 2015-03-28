@@ -2,6 +2,7 @@
 #define GRU_LAYER_H
 
 #include "layer.h"
+#include "inner_product_layer.h"
 
 class gru_layer : public layer {
 public:
@@ -15,9 +16,15 @@ public:
     virtual void end_batch(int size);
 
 private:
-    block_ptr m_hide_block;
     block_ptr m_input_block;
     block_ptr m_output_block;
+
+    layer_ptr m_r_product_layer;
+    layer_ptr m_r_sigmoid_layer;
+    layer_ptr m_z_product_layer;
+    layer_ptr m_z_sigmoid_layer;
+    layer_ptr m_h_
+
     int m_output_num;
     int m_hide_num;
 };

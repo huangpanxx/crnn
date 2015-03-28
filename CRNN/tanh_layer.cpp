@@ -14,13 +14,46 @@ void tanh_layer::setup_block(){
 };
 
 bool tanh_layer::begin_seq(){ 
+    this->m_mid_history.clear();
+    this->m_output_block->error().clear(0);
+    this->m_output_block->signal().clear(0);
     return true; 
 }
 
 bool tanh_layer::forward(int t){
+    auto& input = this->m_input_block->signal();
+    auto& output = this->m_output_block->new_signal();
+    auto mid = input.clone(false);
+
+    const int size = input.size();
+
+    OMP_FOR
+    for (int i = 0; i < size; ++i){
+        float x = input.at(i);
+        float q = x>0 ? exp(-x) : exp(x);
+        float v = q*q;
+        if (x > 0) { v = (v - 1) / (v + 1); }
+        else{ v = (1 - v) / (1 + v); }
+        output.at(i) = v;
+        mid.at(i) = q;
+    }
+
+    m_mid_history.push_back(mid);
+
     return true;
 };
 
 void tanh_layer::backward(int t){
+    auto& mid = this->m_mid_history.back();
+    auto& ierr = this->m_input_block->error();
+    auto& oerr = this->m_output_block->error();
+    const int size = ierr.size();
 
+    OMP_FOR
+    for (int i = 0; i < size; ++i){
+        float q = mid.at(i);
+        ierr.at(i) += oerr.at(i) * 2 * q / (1 + q*q);
+    }
+
+    this->m_mid_history.pop_back();
 };

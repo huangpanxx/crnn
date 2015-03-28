@@ -376,6 +376,11 @@ public:
         m_error = array(dims);
     }
 
+    void clear(float v = 0) {
+        this->signal().clear(v);
+        this->error().clear(v);
+    }
+
     // never set the m_signal & m_error variable directly,
     // unless make sure src&dst have the same dims
     array& signal(){ return m_signal; }

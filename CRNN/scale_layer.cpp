@@ -23,7 +23,7 @@ bool scale_layer::forward(int t) {
     auto& output = this->m_output_block->new_signal();
     auto& input = this->m_input_block->signal();
     if (m_bias != 0){
-        mul(input, m_scale, output, m_bias);
+        mul(input, m_scale, m_bias,output);
     }
     else {
         mul(input, m_scale, output);

@@ -14,6 +14,7 @@ public:
 private:
     block_ptr m_input_block;
     block_ptr m_output_block;
+    std::vector<array> m_mid_history;
 };
 
 #endif

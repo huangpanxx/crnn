@@ -140,6 +140,7 @@
     <ClInclude Include="layer.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="scale_layer.h" />
+    <ClInclude Include="tanh_layer.h" />
     <ClInclude Include="wise_multiply_layer.h" />
     <ClInclude Include="multi_softmax_layer.h" />
     <ClInclude Include="multi_softmax_loss_layer.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="scale_layer.cpp" />
+    <ClCompile Include="tanh_layer.cpp" />
     <ClCompile Include="wise_multiply_layer.cpp" />
     <ClCompile Include="multi_softmax_layer.cpp" />
     <ClCompile Include="multi_softmax_loss_layer.cpp" />
