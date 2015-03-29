@@ -23,6 +23,7 @@ bool add_layer::forward(int t){
         auto &input = m_input_blocks[j]->signal();
         output.add(input);
     }
+    return true;
 }
 
 void add_layer::backward(int t){
@@ -36,4 +37,5 @@ void add_layer::backward(int t){
 bool add_layer::begin_seq(){
     this->m_output_block->error().clear(0);
     this->m_output_block->signal().clear(0);
+    return true;
 }

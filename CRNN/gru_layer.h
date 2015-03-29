@@ -14,7 +14,14 @@ public:
     virtual void backward(int t);
     virtual void end_batch(int size);
 
+    virtual void save(std::ostream& os);
+    virtual void load(std::istream& is);
+
+    void create_layers();
+
 private:
+    std::vector<layer_ptr> m_layers;
+
     block_ptr m_input_block;
     block_ptr m_output_block;
 
