@@ -2,11 +2,10 @@
 #define GRU_LAYER_H
 
 #include "layer.h"
-#include "inner_product_layer.h"
 
 class gru_layer : public layer {
 public:
-    gru_layer(block_ptr input, block_ptr output, int output_num, int hide_num);
+    gru_layer(block_ptr input, block_ptr output, int output_num);
 
     virtual void setup_block();
     virtual void setup_params();
@@ -20,13 +19,36 @@ private:
     block_ptr m_output_block;
 
     layer_ptr m_r_product_layer;
+    block_ptr m_r_product_block;
     layer_ptr m_r_sigmoid_layer;
+    block_ptr m_r_sigmoid_block;
+
     layer_ptr m_z_product_layer;
+    block_ptr m_z_product_block;
     layer_ptr m_z_sigmoid_layer;
-    layer_ptr m_h_
+    block_ptr m_z_sigmoid_block;
+
+    layer_ptr m_rhb_product_layer;
+    block_ptr m_rhb_product_block;
+
+    layer_ptr m_hb_product_layer;
+    block_ptr m_hb_product_block;
+
+    layer_ptr m_hb_tanh_layer;
+    block_ptr m_hb_tanh_block;
+
+    layer_ptr m_h_scale_layer;
+    block_ptr m_h_scale_block;
+
+    layer_ptr m_hb_wise_prod_layer;
+    block_ptr m_hb_wise_prod_block;
+
+    layer_ptr m_h_wise_prod_layer;
+    block_ptr m_h_wise_prod_block;
+
+    layer_ptr m_h_add_layer;
 
     int m_output_num;
-    int m_hide_num;
 };
 
 

@@ -1,8 +1,8 @@
 #include "add_layer.h"
 
 add_layer::add_layer(
-    std::vector<block_ptr> &input_blocks,
-    block_ptr output_block) {
+    const std::vector<block_ptr> &input_blocks,
+    block_ptr &output_block) {
     this->m_input_blocks = input_blocks;
     this->m_output_block = output_block;
     CHECK(this->m_input_blocks.size() > 0);

@@ -29,8 +29,8 @@ void multi_softmax_layer::setup_block(){
 bool multi_softmax_layer::forward(int t) {
     array2d output = this->m_output_block->new_signal();
 
-OMP_FOR
-    for (int i = 0; i < (int)m_input_blocks.size(); ++i){
+    OMP_FOR
+    for (int i = 0; i < (int) m_input_blocks.size(); ++i){
         auto& input = m_input_blocks[i]->signal();
         softmax_normalize(input, output, i);
     }

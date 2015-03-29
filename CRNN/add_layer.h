@@ -6,7 +6,7 @@
 
 class add_layer : public layer{
 public:
-    add_layer(std::vector<block_ptr> &input_blocks, block_ptr output_block);
+    add_layer(const std::vector<block_ptr> &input_blocks, block_ptr &output_block);
     virtual void setup_block();
     virtual bool forward(int t);
     virtual void backward(int t);

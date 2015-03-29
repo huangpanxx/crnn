@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="add_layer.h" />
     <ClInclude Include="array_layer.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="conv_layer.h" />
@@ -141,7 +142,7 @@
     <ClInclude Include="memory.h" />
     <ClInclude Include="scale_layer.h" />
     <ClInclude Include="tanh_layer.h" />
-    <ClInclude Include="wise_multiply_layer.h" />
+    <ClInclude Include="wise_product_layer.h" />
     <ClInclude Include="multi_softmax_layer.h" />
     <ClInclude Include="multi_softmax_loss_layer.h" />
     <ClInclude Include="network.h" />
@@ -155,6 +156,7 @@
     <ClInclude Include="utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="add_layer.cpp" />
     <ClCompile Include="array_layer.cpp" />
     <ClCompile Include="conv_layer.cpp" />
     <ClCompile Include="gru_layer.cpp" />
@@ -165,7 +167,7 @@
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="scale_layer.cpp" />
     <ClCompile Include="tanh_layer.cpp" />
-    <ClCompile Include="wise_multiply_layer.cpp" />
+    <ClCompile Include="wise_product_layer.cpp" />
     <ClCompile Include="multi_softmax_layer.cpp" />
     <ClCompile Include="multi_softmax_loss_layer.cpp" />
     <ClCompile Include="network.cpp" />
