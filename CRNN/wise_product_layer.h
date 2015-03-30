@@ -1,11 +1,11 @@
-#ifndef WISE_MULTIPLY_LAYER_H
-#define WISE_MULTIPLY_LAYER_H
+#ifndef WISE_PRODUCT_LAYER_H
+#define WISE_PRODUCT_LAYER_H
 
 #include "layer.h"
 
-class wise_multiply_layer : public layer {
+class wise_product_layer : public layer {
 public:
-    wise_multiply_layer(block_ptr input1, block_ptr input2, block_ptr output);
+    wise_product_layer(block_ptr input1, block_ptr input2, block_ptr output);
 
     virtual void setup_block();
     virtual bool begin_seq();

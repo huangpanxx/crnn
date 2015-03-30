@@ -1,9 +1,11 @@
 #include "scale_layer.h"
 
-scale_layer::scale_layer(block_ptr input, block_ptr output, float scale) {
+scale_layer::scale_layer(block_ptr input, block_ptr output,
+    float scale,float bias) {
     this->m_input_block = input;
     this->m_output_block = output;
     this->m_scale = scale;
+    this->m_bias = bias;
 }
 
 void scale_layer::setup_block() {
@@ -20,7 +22,12 @@ bool scale_layer::begin_seq() {
 bool scale_layer::forward(int t) {
     auto& output = this->m_output_block->new_signal();
     auto& input = this->m_input_block->signal();
-    mul(input, m_scale, output);
+    if (m_bias != 0){
+        mul(input, m_scale, m_bias,output);
+    }
+    else {
+        mul(input, m_scale, output);
+    }
     return true;
 }
 

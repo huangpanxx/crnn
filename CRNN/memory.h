@@ -319,6 +319,15 @@ inline void mul(const array& src, float factor, array& dst){
     }
 }
 
+inline void mul(const array& src, float factor, float bias, array& dst) {
+    assert(src.size() == dst.size());
+    const int size = src.size();
+    OMP_FOR
+    for (int i = 0; i < size; ++i) {
+        dst.at(i) = src.at(i) * factor + bias;
+    }
+}
+
 inline void mul_add(const array& src, float factor, array& dst){
     assert(src.size() == dst.size());
     const int size = src.size();
@@ -365,6 +374,11 @@ public:
     void resize(const std::vector<int> &dims){
         m_signal = array(dims);
         m_error = array(dims);
+    }
+
+    void clear(float v = 0) {
+        this->signal().clear(v);
+        this->error().clear(v);
     }
 
     // never set the m_signal & m_error variable directly,

@@ -1,26 +1,26 @@
-#include "wise_multiply_layer.h"
+#include "wise_product_layer.h"
 using namespace std;
 
-wise_multiply_layer::wise_multiply_layer(block_ptr input1, block_ptr input2, block_ptr output) {
+wise_product_layer::wise_product_layer(block_ptr input1, block_ptr input2, block_ptr output) {
     this->m_input_block1 = input1;
     this->m_input_block2 = input2;
     this->m_output_block = output;
 }
 
-void wise_multiply_layer::setup_block() {
+void wise_product_layer::setup_block() {
     CHECK(this->m_input_block1->size() > 0);
     CHECK(this->m_input_block1->size() == this->m_input_block2->size());
     this->m_output_block->resize(this->m_input_block1->size());
 }
 
-bool wise_multiply_layer::begin_seq() {
+bool wise_product_layer::begin_seq() {
     this->m_output_block->error().clear();
     this->m_output_block->signal().clear(0);
     this->m_input_history.clear();
     return true;
 }
 
-bool wise_multiply_layer::forward(int t){
+bool wise_product_layer::forward(int t){
     auto& input1 = this->m_input_block1->signal();
     auto& input2 = this->m_input_block2->signal();
     auto& output = this->m_output_block->new_signal();
@@ -29,7 +29,7 @@ bool wise_multiply_layer::forward(int t){
     return true;
 }
 
-void wise_multiply_layer::backward(int t){
+void wise_product_layer::backward(int t){
     auto& pair = this->m_input_history.back();
 
     auto& input1 = pair.first;
