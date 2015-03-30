@@ -14,6 +14,7 @@
 #include "relu_layer.h"
 #include "softmax_layer.h"
 #include "network.h"
+#include "gru_layer.h"
 using namespace std;
 
 
@@ -358,7 +359,12 @@ void test(){
             system("pause");
         }
     }
+}
 
+void test_gru_layer(){
+    auto input_block = block::new_block();
+    auto output_block = block::new_block();
+    gru_layer()
 }
 
 int main(int argc, char **argv) {
