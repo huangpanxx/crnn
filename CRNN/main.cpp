@@ -39,9 +39,9 @@ void test_xor() {
 
     shared_ptr<array_layer> array_layer(new array_layer(samples, data_block,
         label_block, 4, 50000, 1));
-    shared_ptr<layer> ip1_layer(new inner_product_layer(2, data_block, ip_hid1_block));
+    shared_ptr<layer> ip1_layer(new inner_product_layer(data_block, ip_hid1_block, 2));
     shared_ptr<layer> sig1_layer(new relu_layer(ip_hid1_block, sig_hid1_block));
-    shared_ptr<layer> ip2_layer(new inner_product_layer(2, sig_hid1_block, ip_hid2_block));
+    shared_ptr<layer> ip2_layer(new inner_product_layer(sig_hid1_block, ip_hid2_block, 2));
     shared_ptr<softmax_loss_layer> loss_layer(new softmax_loss_layer(ip_hid2_block, label_block));
 
     loss_layer->set_report(false);
@@ -78,13 +78,13 @@ void test_mlp(){
         data_block, label_block, 15, 10000, 100, -1, -1));
 
     shared_ptr<inner_product_layer> fc1_layer(
-        new inner_product_layer(200, data_block , fc1_block));
+        new inner_product_layer(data_block , fc1_block,200));
 
     shared_ptr<layer> sig1_layer(
         new sigmoid_layer(fc1_block, sig1_block));
 
     shared_ptr<inner_product_layer> fc2_layer(
-        new inner_product_layer(36, sig1_block, fc2_block));
+        new inner_product_layer(sig1_block, fc2_block, 36));
 
     shared_ptr<softmax_loss_layer> loss_layer(
         new softmax_loss_layer(fc2_block, label_block));
@@ -145,7 +145,7 @@ void test_conv() {
     sig2_layer->set_name("relu2");
 
     shared_ptr<inner_product_layer> fc1_layer(
-        new inner_product_layer(800, sig2_block, fc1_block));
+        new inner_product_layer(sig2_block, fc1_block, 800));
     fc1_layer->set_name("fc1.1");
 
     shared_ptr<layer> sig3_layer(
@@ -155,7 +155,7 @@ void test_conv() {
 
     int output = data_layer->label_dims()[1];
     shared_ptr<inner_product_layer> fc2_layer(
-        new inner_product_layer(output, sig3_block, fc2_block));
+        new inner_product_layer(sig3_block, fc2_block, output));
     fc2_layer->set_name("fc2.1");
 
     shared_ptr<softmax_loss_layer> loss_layer(
@@ -364,7 +364,55 @@ void test(){
 void test_gru_layer(){
     auto input_block = block::new_block();
     auto output_block = block::new_block();
-    gru_layer()
+    auto label_block = block::new_block();
+    layer_ptr layer1(new gru_layer(input_block, output_block, 3));
+    //layer_ptr layer1(new inner_product_layer(input_block, output_block, 3));
+    layer_ptr layer2(new softmax_loss_layer(output_block, label_block));
+    ((softmax_loss_layer*) layer2.get())->set_report(true);
+
+    input_block->resize(1);
+    label_block->resize(3, 3);
+
+    vector<layer_ptr> layers = { layer1, layer2 };
+    setup_block(layers);
+    setup_params(layers);
+
+   input_block->clear(0);
+   label_block->clear(0);
+   for (int i = 0; i < 3; ++i){
+       array2d arr = label_block->signal();
+       arr.at2(i, i) = 1;
+   }
+
+   while (true){
+       float sr = input_block->error().sum();
+
+       for (auto& layer : layers){
+           layer->begin_seq();
+       }
+
+       vector<pair<layer_ptr,int> > history;
+       for (int i = 0; i < 1; ++i){
+           for (auto& layer : layers){
+               layer->forward(i);
+               history.push_back({ layer, i });
+           }
+       }
+
+       for (auto it = history.rbegin(); it != history.rend(); ++it){
+           auto pair = *it;
+           pair.first->backward(pair.second);
+       }
+
+       loss_layer* los_layer = (loss_layer*) layer2.get();
+       float loss = los_layer->loss();
+       printf("%.9f\n", loss);
+
+       for (auto& layer : layers){
+           layer->end_batch(1);
+       }
+   }
+
 }
 
 int main(int argc, char **argv) {
@@ -374,6 +422,8 @@ int main(int argc, char **argv) {
     //test_mlp();
     //test_omp();
     //cout << (int) (2147483648) << endl;
+    test_gru_layer();
+    return 0;
 
     string model_file = "";
     if (argc == 2) {

@@ -52,8 +52,11 @@ void tanh_layer::backward(int t){
     OMP_FOR
     for (int i = 0; i < size; ++i){
         float q = mid.at(i);
-        ierr.at(i) += oerr.at(i) * 2 * q / (1 + q*q);
+        float v = 2 * q / (1 + q*q);
+        ierr.at(i) += oerr.at(i) * v*v;
     }
+
+    oerr.clear(0);
 
     this->m_mid_history.pop_back();
 };

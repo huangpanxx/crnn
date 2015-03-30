@@ -28,10 +28,11 @@ bool add_layer::forward(int t){
 
 void add_layer::backward(int t){
     auto& oerr = this->m_output_block->error();
-    for (int i = 0; i < this->m_input_blocks.size(); ++i){
+    for (int i = 0; i < (int)this->m_input_blocks.size(); ++i){
         auto& ierr = m_input_blocks[i]->error();
         ierr.copy(oerr);
     }
+    oerr.clear(0);
 }
 
 bool add_layer::begin_seq(){

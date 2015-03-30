@@ -6,14 +6,14 @@
 class inner_product_layer : public layer {
 public:
     inner_product_layer(
-        int output_num,
         const std::vector<std::shared_ptr<block> > &input_blocks,
-        const std::shared_ptr<block> &output_block);
+        const std::shared_ptr<block> &output_block,
+        int output_num);
 
     inner_product_layer(
-        int output_num,
         const std::shared_ptr<block> &input_block,
-        const std::shared_ptr<block> &output_block);
+        const std::shared_ptr<block> &output_block,
+        int output_num);
 
     virtual void setup_block();
     virtual void setup_params();
@@ -28,9 +28,9 @@ public:
 
 private:
     void initialize(
-        int output_num,
         const std::vector<std::shared_ptr<block> > &input_blocks,
-        const std::shared_ptr<block> &output_block);
+        const std::shared_ptr<block> &output_block,
+        int output_num);
 private:
     int m_output_num;
 

@@ -43,8 +43,8 @@ private:
     std::vector<std::vector<layer_ptr> > m_activate_layer_seq;
     std::vector<layer_ptr> m_beg_layer_seq;
     std::map<std::string, layer_ptr> m_layer_cache;
-    std::shared_ptr<data_layer> m_data_layer;
-    std::shared_ptr<loss_layer> m_loss_layer;
+    layer_ptr m_data_layer;
+    layer_ptr m_loss_layer;
     std::string m_model_file;
     picojson::value m_config;
     std::vector<int> m_input_dims;

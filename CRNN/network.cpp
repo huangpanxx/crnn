@@ -79,7 +79,7 @@ network::network(const std::string& config, const std::string& plan) {
         CHECK(plan_config.contains("data"));
         auto data_layer_name = plan_config.get("data").get<string>();
         auto loss_layer_name = plan_config.get("loss").get<string>();
-        m_data_layer = shared_ptr<data_layer>((data_layer*) get_layer(data_layer_name).get());
+        m_data_layer.reset((data_layer*) get_layer(data_layer_name).get());
         m_loss_layer = shared_ptr<loss_layer>((loss_layer*) get_layer(loss_layer_name).get());
     }
     else{
@@ -195,7 +195,7 @@ void network::train() {
     CHECK(this->m_data_layer);
     CHECK(this->m_loss_layer);
 
-    const int batch = m_data_layer->batch();
+    const int batch = ((data_layer*) m_data_layer.get())->batch();
     CHECK(batch >= 1);
 
     auto start_time = clock();
@@ -205,7 +205,7 @@ void network::train() {
         if (iter % batch == 0 && iter) {
             //print info
             float freq = (float) (batch) * CLOCKS_PER_SEC / (clock() - start_time);
-            float loss = m_loss_layer->loss();
+            float loss = ((loss_layer*)m_loss_layer.get())->loss();
             printf("epoch %d, %.3f iter/s, loss = %.8f.                     \n",
                 epoch, freq, loss);
 
@@ -226,7 +226,7 @@ void network::train() {
             //skip
             if (loss < m_stop_loss) {
                 printf("move to next batch.\n");
-                m_data_layer->move_to_next_batch();
+                ((data_layer*) m_data_layer.get())->move_to_next_batch();
             }
             start_time = clock();
         }

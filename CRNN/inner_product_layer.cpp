@@ -3,16 +3,16 @@
 using namespace std;
 
 inner_product_layer::inner_product_layer(
-    int output_num,
     const vector<shared_ptr<block> > &input_blocks,
-    const shared_ptr<block> &output_block) {
-    initialize(output_num, input_blocks, output_block);
+    const shared_ptr<block> &output_block,
+    int output_num) {
+    initialize(input_blocks, output_block, output_num);
 }
 
 void inner_product_layer::initialize(
-    int output_num,
     const std::vector<std::shared_ptr<block> > &input_blocks,
-    const std::shared_ptr<block> &output_block){
+    const std::shared_ptr<block> &output_block,
+    int output_num){
     CHECK(input_blocks.size() > 0);
     CHECK(output_num > 0);
     this->m_output_num = output_num;
@@ -21,12 +21,12 @@ void inner_product_layer::initialize(
 }
 
 inner_product_layer::inner_product_layer(
-    int output_num,
     const std::shared_ptr<block> &input_block,
-    const std::shared_ptr<block> &output_block) {
+    const std::shared_ptr<block> &output_block,
+    int output_num) {
     vector<shared_ptr<block> > input_blocks;
     input_blocks.push_back(input_block);
-    initialize(output_num, input_blocks, output_block);
+    initialize(input_blocks, output_block, output_num);
 }
 
 void inner_product_layer::setup_block() {
@@ -185,7 +185,7 @@ layer_ptr create_inner_product_layer(
 
     int output_num = (int) config.get("output_num").get<double>();
 
-    return layer_ptr(new inner_product_layer(output_num, input_blocks, output_block));
+    return layer_ptr(new inner_product_layer(input_blocks, output_block, output_num));
 }
 
 REGISTER_LAYER(inner_product, create_inner_product_layer);

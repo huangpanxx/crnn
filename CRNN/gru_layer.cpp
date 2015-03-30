@@ -14,18 +14,34 @@ gru_layer::gru_layer(block_ptr input, block_ptr output, int output_num) {
 }
 
 void gru_layer::setup_block() {
+    create_layers();
+
     if (this->m_output_block->empty()){
         this->m_output_block->resize(m_output_num);
     }
     CHECK(this->m_output_block->size() == m_output_num);
+
+    for (auto& layer : m_layers){
+        layer->setup_block();
+    }
 }
 
 void gru_layer::create_layers() {
+    this->m_hb_product_block = block::new_block();
+    this->m_hb_tanh_block = block::new_block();
+    this->m_hb_wise_prod_block = block::new_block();
+    this->m_h_scale_block = block::new_block();
+    this->m_h_wise_prod_block = block::new_block();
+    this->m_rhb_product_block = block::new_block();
+    this->m_r_product_block = block::new_block();
+    this->m_r_sigmoid_block = block::new_block();
+    this->m_z_product_block = block::new_block();
+    this->m_z_sigmoid_block = block::new_block();
+
     //r
     this->m_r_product_layer.reset(new inner_product_layer(
-        m_output_num,
-        { m_input_block, m_output_block },
-        m_r_product_block));
+    { m_input_block, m_output_block },
+    m_r_product_block, m_output_num));
     m_layers.push_back(m_r_product_layer);
 
     this->m_r_sigmoid_layer.reset(new sigmoid_layer(
@@ -35,9 +51,8 @@ void gru_layer::create_layers() {
 
     //z
     this->m_z_product_layer.reset(new inner_product_layer(
-        m_output_num,
-        { m_input_block, m_output_block },
-        m_z_product_block));
+    { m_input_block, m_output_block },
+    m_z_product_block, m_output_num));
     m_layers.push_back(m_z_product_layer);
 
     this->m_z_sigmoid_layer.reset(new sigmoid_layer(
@@ -52,8 +67,8 @@ void gru_layer::create_layers() {
 
     //hb
     this->m_hb_product_layer.reset(new inner_product_layer(
-        m_output_num, { m_input_block, m_rhb_product_block },
-        m_hb_product_block));
+    { m_input_block, m_rhb_product_block },
+    m_hb_product_block, m_output_num));
     m_layers.push_back(m_hb_product_layer);
 
     //hb_tanh
@@ -84,7 +99,6 @@ void gru_layer::create_layers() {
 }
 
 void gru_layer::setup_params() {
-    create_layers();
     for (auto& layer : m_layers){
         layer->setup_params();
     }
