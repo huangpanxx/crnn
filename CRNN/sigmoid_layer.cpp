@@ -56,12 +56,13 @@ bool sigmoid_layer::begin_seq() {
 
 
 
-layer_ptr create_sigmoid_layer(const picojson::value& config,
+layer_ptr create_sigmoid_layer(
+    const picojson::value& config,
+    const string& layer_name,
     block_factory& bf) {
-    int input_block_id = (int) config.get("input").get<double>();
-    int output_block_id = (int) config.get("output").get<double>();
+    string input_block_id =  config.get("input").get<string>();
     auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(output_block_id);
+    auto output_block = bf.get_block(layer_name);
     return layer_ptr(new sigmoid_layer(input_block, output_block));
 }
 

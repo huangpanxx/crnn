@@ -39,14 +39,14 @@ network::network(const std::string& config, const std::string& plan) {
     //predict
     if (plan_config.contains("input")) {
         CHECK(plan_config.contains("output"));
-        m_input_block_id = (int) plan_config.get("input").get<double>();
-        m_output_block_id = (int) plan_config.get("output").get<double>();
+        m_input_block_id =  plan_config.get("input").get<string>();
+        m_output_block_id =  plan_config.get("output").get<string>();
         auto input_block = m_block_factory.get_block(m_input_block_id);
         input_block->resize(m_input_dims);
     }
     else{
-        m_input_block_id = INT_MAX;
-        m_output_block_id = INT_MAX;
+        m_input_block_id = "";
+        m_output_block_id = "";
     }
 
     //create layers
@@ -137,8 +137,8 @@ layer_ptr network::get_layer(const std::string &name) {
                 printf("create layer, type = %s, name = %s.\n",
                     type.c_str(), name.c_str());
                 auto fn = get_layer_factory(type);
-                auto layer = fn(v, this->m_block_factory);
-                config_layer(v, layer);
+                auto layer = fn(v, name, this->m_block_factory);
+                config_layer(v, name, layer);
                 m_layer_cache[name] = layer;
                 is_created = true;
                 break;
@@ -161,9 +161,8 @@ vector<layer_ptr> network::get_layers(const std::vector<string> &names) {
     return layer_seq;
 }
 
-void network::config_layer(picojson::value& val, layer_ptr& layer){
-    auto name = val.get("name").get<string>();
-    layer->set_name(name);
+void network::config_layer(picojson::value& val, const string& layer_name, layer_ptr& layer){
+    layer->set_name(layer_name);
     layer->set_learn_rate(m_learn_rate);
 
     if (val.contains("learn_rate")) {
@@ -185,7 +184,7 @@ void network::config_layer(picojson::value& val, layer_ptr& layer){
     }
 
     printf("layer %s, learn_rate = %.8f, momentum = %0.8f.\n",
-        name.c_str(),
+        layer_name.c_str(),
         layer->learn_rate(),
         layer->momentum_decay());
 }
@@ -278,7 +277,7 @@ void network::train() {
 }
 
 void network::set_input(const array& data){
-    CHECK(m_input_block_id != INT_MAX);
+    CHECK(m_input_block_id != "");
     auto &input = this->m_block_factory.get_block(this->m_input_block_id);
     input->signal().copy(data);
     this->m_t = 0;

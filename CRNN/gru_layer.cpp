@@ -144,17 +144,18 @@ void gru_layer::load(std::istream& is){
     }
 }
 
-layer_ptr create_gru_layer(const picojson::value& config,
+layer_ptr create_gru_layer(
+    const picojson::value& config,
+    const string& layer_name,
     block_factory& bf) {
     CHECK(config.contains("input"));
     CHECK(config.contains("output"));
     CHECK(config.contains("output_num"));
 
-    int input_block_id = (int) config.get("input").get<double>();
-    int output_block_id = (int) config.get("output").get<double>();
+    string input_block_id =  config.get("input").get<string>();
     int output_num = (int)config.get("output_num").get<double>();
     auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(output_block_id);
+    auto output_block = bf.get_block(layer_name);
     return layer_ptr(new gru_layer(input_block, output_block, output_num));
 }
 

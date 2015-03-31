@@ -49,16 +49,17 @@ void multi_softmax_layer::end_batch(int size) {
 
 
 layer_ptr create_multi_softmax_layer(
-    const picojson::value& config, block_factory& bf){
+    const picojson::value& config,
+    const string& layer_name,
+    block_factory& bf){
     auto input_ids_arr = config.get("inputs").get<picojson::array>();
-    vector<int> input_ids;
+    vector<string> input_ids;
     for (auto &val : input_ids_arr){
-        int id = (int) val.get<double>();
+        auto id =  val.get<string>();
         input_ids.push_back(id);
     }
-    int output_id = (int) config.get("output").get<double>();
     auto input_blocks = bf.get_blocks(input_ids);
-    auto output_block = bf.get_block(output_id);
+    auto output_block = bf.get_block(layer_name);
     return layer_ptr(new multi_softmax_layer(input_blocks, output_block));
 }
 

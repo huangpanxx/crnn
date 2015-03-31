@@ -76,11 +76,11 @@ void softmax_loss_layer::end_batch(int size) {
 
 layer_ptr create_softmax_loss_layer(
     const picojson::value& config,
+    const string& layer_name,
     block_factory& bf){
-    int input_id = (int)config.get("input").get<double>();
-    int label_id = (int)config.get("label").get<double>();
+    auto input_id = config.get("input").get<string>();
     auto input_block = bf.get_block(input_id);
-    auto label_block = bf.get_block(label_id);
+    auto label_block = bf.get_block("label");
     return layer_ptr(new softmax_loss_layer(input_block, label_block));
 }
 

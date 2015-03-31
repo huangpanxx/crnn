@@ -35,12 +35,13 @@ void softmax_layer::end_batch(int size) {
 
 
 layer_ptr create_softmax_layer(
-    const picojson::value& config, block_factory& bf){
+    const picojson::value& config,
+    const string& layer_name,
+    block_factory& bf){
 
-    int input_id = (int) config.get("input").get<double>();
-    int output_id = (int) config.get("output").get<double>();
+    auto input_id =  config.get("input").get<string>();
     auto input_block = bf.get_block(input_id);
-    auto output_block = bf.get_block(output_id);
+    auto output_block = bf.get_block(layer_name);
 
     return layer_ptr(new softmax_layer(input_block, output_block));
 }

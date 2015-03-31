@@ -101,15 +101,15 @@ void relu_layer::end_batch(int size) {
     m_negtive_slop_grad.mul(md / (md + 1.0f));
 }
 
-layer_ptr create_relu_layer(const picojson::value& config,
+layer_ptr create_relu_layer(
+    const picojson::value& config,
+    const string& layer_name,
     block_factory& bf) {
     CHECK(config.contains("input"));
-    CHECK(config.contains("output"));
     CHECK(config.contains("share"));
-    int input_block_id = (int)config.get("input").get<double>();
-    int output_block_id = (int) config.get("output").get<double>();
+    auto input_block_id = config.get("input").get<string>();
     auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(output_block_id);
+    auto output_block = bf.get_block(layer_name);
     bool share = config.get("share").get<bool>();
     return layer_ptr(new relu_layer(input_block, output_block, share));
 }

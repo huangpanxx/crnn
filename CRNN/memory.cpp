@@ -149,16 +149,16 @@ void array::destroy(){
 }
 
 
-block_ptr block_factory::get_block(int id) {
+block_ptr block_factory::get_block(const string& id) {
     if (m_cache.count(id) == 0) {
         m_cache[id] = block::new_block();
     }
     return m_cache[id];
 }
 
-vector<block_ptr> block_factory::get_blocks(const vector<int>& ids){
+vector<block_ptr> block_factory::get_blocks(const vector<string>& ids){
     vector<block_ptr> blocks;
-    for (int id : ids){
+    for (auto& id : ids){
         blocks.push_back(this->get_block(id));
     }
     return blocks;

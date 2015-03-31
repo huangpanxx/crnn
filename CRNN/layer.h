@@ -52,7 +52,9 @@ public:
 
 typedef std::shared_ptr<layer> layer_ptr;
 
-typedef std::function<layer_ptr(const picojson::value& config,
+typedef std::function<layer_ptr(
+    const picojson::value& config,
+    const std::string& layer_name,
     block_factory& bf)> layer_factory_fn;
 
 void register_layer_factory(std::string name, layer_factory_fn fn);

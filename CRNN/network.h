@@ -8,7 +8,7 @@ class network {
 public:
     network(const std::string& config, const std::string& plan);
 
-    block_ptr block(int id) {
+    block_ptr block(const std::string& id) {
         CHECK(m_block_factory.contains(id));
         return m_block_factory.get_block(id);
     }
@@ -35,7 +35,7 @@ private:
     layer_ptr get_layer(const std::string &name);
     std::vector<layer_ptr> get_layers(const picojson::value& val);
     std::vector<layer_ptr> get_layers(const std::vector<std::string> &names);
-    void config_layer(picojson::value& val, layer_ptr& layer);
+    void config_layer(picojson::value& val, const std::string& layer_name, layer_ptr& layer);
     std::map<int, std::string> m_label_dict;
 
 private:
@@ -49,11 +49,12 @@ private:
     picojson::value m_config;
     std::vector<int> m_input_dims;
     int m_save_epoch;
-    int m_input_block_id;
-    int m_output_block_id;
     int m_t;
     float m_stop_loss;
     float m_learn_rate;
+
+    std::string m_output_block_id;
+    std::string m_input_block_id;
 };
 
 #endif

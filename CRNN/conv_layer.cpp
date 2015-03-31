@@ -208,17 +208,17 @@ void conv_layer::load(std::istream& os){
 
 layer_ptr create_conv_layer(
     const picojson::value& config,
+    const string& layer_name,
     block_factory& bf) {
     auto name = config.get("name").get<string>();
-    int input_block_id = (int)config.get("input").get<double>();
-    int output_block_id = (int)config.get("output").get<double>();
+    auto input_block_id = config.get("input").get<string>();
     int kernel_size = (int)config.get("kernel_size").get<double>();
     int kernel_num = (int)config.get("kernel_num").get<double>();
     int kernel_stride = (int)config.get("kernel_stride").get<double>();
     CHECK(kernel_size > 0);
     CHECK(kernel_num > 0);
     auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(output_block_id);
+    auto output_block = bf.get_block(layer_name);
     return layer_ptr(new conv_layer(input_block, output_block,
         kernel_size, kernel_num, kernel_stride));
     return 0;

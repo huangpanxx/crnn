@@ -170,18 +170,18 @@ void inner_product_layer::load(std::istream& is) {
 
 layer_ptr create_inner_product_layer(
     const picojson::value& config,
+    const string& layer_name,
     block_factory& bf) {
     auto inputs = config.get("inputs").get<picojson::array>();
-    vector<int> input_ids;
+    vector<string> input_ids;
     for (auto input : inputs) {
-        int id = (int) input.get<double>();
+        auto id =  input.get<string>();
         input_ids.push_back(id);
     }
     sort(input_ids.begin(), input_ids.end());
     vector<block_ptr> input_blocks = bf.get_blocks(input_ids);
 
-    auto output_id = (int) config.get("output").get<double>();
-    auto output_block = bf.get_block(output_id);
+    auto output_block = bf.get_block(layer_name);
 
     int output_num = (int) config.get("output_num").get<double>();
 

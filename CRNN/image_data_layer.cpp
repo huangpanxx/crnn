@@ -79,11 +79,10 @@ image_data_layer::image_data_layer(
 
 layer_ptr create_image_layer(
     const picojson::value& config,
+    const string& layer_name,
     block_factory& bf) {
     string label_file = config.get("label_file").get<string>();
     string data_dir = config.get("data_dir").get<string>();
-    int data_id = (int) config.get("data").get<double>();
-    int label_id = (int) config.get("label").get<double>();
     int batch = (int) config.get("batch").get<double>();
 
     //default iter = 1
@@ -106,8 +105,8 @@ layer_ptr create_image_layer(
     CHECK(config.contains("height"));
     int height = (int) config.get("height").get<double>();
 
-    auto data_block = bf.get_block(data_id);
-    auto label_block = bf.get_block(label_id);
+    auto data_block = bf.get_block("data");
+    auto label_block = bf.get_block("label");
 
     return layer_ptr(
         new image_data_layer(data_dir, label_file,

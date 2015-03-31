@@ -103,19 +103,19 @@ void max_pooling_layer::backward(int t) {
 }
 
 
-layer_ptr create_max_pooling_layer(const picojson::value& config,
+layer_ptr create_max_pooling_layer(
+    const picojson::value& config,
+    const string& layer_name,
     block_factory& bf) {
     CHECK(config.contains("input"));
-    CHECK(config.contains("output"));
     CHECK(config.contains("size"));
-    int input_block_id = (int) config.get("input").get<double>();
-    int output_block_id = (int) config.get("output").get<double>();
+    auto input_block_id = config.get("input").get<string>();
     auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(output_block_id);
-    int size = (int)config.get("size").get<double>();
+    auto output_block = bf.get_block(layer_name);
+    int size = (int) config.get("size").get<double>();
     int stride = size;
     if (config.contains("stride")){
-       stride = (int) config.get("stride").get<double>();
+        stride = (int) config.get("stride").get<double>();
     }
     return layer_ptr(new max_pooling_layer(input_block, output_block, size, stride));
 }

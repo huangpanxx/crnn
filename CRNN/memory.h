@@ -418,21 +418,20 @@ typedef std::shared_ptr<block> block_ptr;
 
 class block_factory {
 public:
-    block_ptr get_block(int id);
+    block_ptr get_block(const std::string& id);
 
-    std::vector<block_ptr> get_blocks(const std::vector<int>& ids);
+    std::vector<block_ptr> get_blocks(const std::vector<std::string>& ids);
 
-    bool contains(int id) {
+    bool contains(const std::string& id) {
         return m_cache.count(id) != 0;
     }
-
 
     static std::shared_ptr<block_factory> new_factory() {
         return std::shared_ptr<block_factory>(new block_factory());
     }
 
 private:
-    std::map<int, block_ptr> m_cache;
+    std::map<std::string, block_ptr> m_cache;
 };
 
 
