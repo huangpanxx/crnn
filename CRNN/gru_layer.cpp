@@ -11,11 +11,10 @@ gru_layer::gru_layer(block_ptr input, block_ptr output, int output_num) {
     this->m_input_block = input;
     this->m_output_block = output;
     this->m_output_num = output_num;
+    create_layers();
 }
 
 void gru_layer::setup_block() {
-    create_layers();
-
     if (this->m_output_block->empty()){
         this->m_output_block->resize(m_output_num);
     }
@@ -149,7 +148,6 @@ layer_ptr create_gru_layer(
     const string& layer_name,
     block_factory& bf) {
     CHECK(config.contains("input"));
-    CHECK(config.contains("output"));
     CHECK(config.contains("output_num"));
 
     string input_block_id =  config.get("input").get<string>();

@@ -79,8 +79,8 @@ network::network(const std::string& config, const std::string& plan) {
         CHECK(plan_config.contains("data"));
         auto data_layer_name = plan_config.get("data").get<string>();
         auto loss_layer_name = plan_config.get("loss").get<string>();
-        m_data_layer.reset((data_layer*) get_layer(data_layer_name).get());
-        m_loss_layer = shared_ptr<loss_layer>((loss_layer*) get_layer(loss_layer_name).get());
+        m_data_layer = (data_layer*) get_layer(data_layer_name).get();
+        m_loss_layer = (loss_layer*) get_layer(loss_layer_name).get();
     }
     else{
         m_data_layer = 0;
@@ -194,7 +194,7 @@ void network::train() {
     CHECK(this->m_data_layer);
     CHECK(this->m_loss_layer);
 
-    const int batch = ((data_layer*) m_data_layer.get())->batch();
+    const int batch = m_data_layer->batch();
     CHECK(batch >= 1);
 
     auto start_time = clock();
@@ -204,7 +204,7 @@ void network::train() {
         if (iter % batch == 0 && iter) {
             //print info
             float freq = (float) (batch) * CLOCKS_PER_SEC / (clock() - start_time);
-            float loss = ((loss_layer*)m_loss_layer.get())->loss();
+            float loss = m_loss_layer->loss();
             printf("epoch %d, %.3f iter/s, loss = %.8f.                     \n",
                 epoch, freq, loss);
 
@@ -225,7 +225,7 @@ void network::train() {
             //skip
             if (loss < m_stop_loss) {
                 printf("move to next batch.\n");
-                ((data_layer*) m_data_layer.get())->move_to_next_batch();
+                m_data_layer->move_to_next_batch();
             }
             start_time = clock();
         }
@@ -284,9 +284,14 @@ void network::set_input(const array& data){
 }
 
 array network::forward(){
-    vector<layer_ptr> &acti_seq = m_activate_layer_seq.back();
+    vector<layer_ptr> acti_seq;
+
+    //select acti seq
     if (m_t < (int)m_activate_layer_seq.size()) {
         acti_seq = m_activate_layer_seq[m_t];
+    }
+    else{
+        acti_seq = m_activate_layer_seq.back();
     }
 
     //beg
