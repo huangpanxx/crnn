@@ -169,6 +169,7 @@ void test_network(const string& filename) {
 
             //read output
             string ans = "";
+            const int max_length = 20;
 
             for (int i = 0;; ++i) {
                 //forward
@@ -180,8 +181,8 @@ void test_network(const string& filename) {
                     if (label == "eof") {
                         break;
                     }
-                    if (i >= 20){
-                        ::printf("seq is too long!\n");
+                    if (i > max_length) {
+                        ::printf("seq is too long!");
                         break;
                     }
                     ans += label;

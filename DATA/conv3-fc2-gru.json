@@ -1,0 +1,165 @@
+{
+	"model" : "conv3-fc2-gru.bin",
+	"save_epoch" : 50,
+	"input_dims" : [65,140,3],
+	"learn_rate" : 0.01,
+
+	"layers" : [
+		{
+			"type" : "image_data",
+			"name" : "image_data",
+			"label_file" : "label.txt",
+			"data_dir" : "data",
+			"width" : 140,
+			"height" : 65,
+			"batch" : 100,
+			"label_size" : 37,
+			"loop" : 10000
+		},
+
+		{
+			"type" : "conv",
+			"name" : "conv1",
+			"input" : "data",
+			"kernel_size" : 7,
+			"kernel_num" : 64,
+			"kernel_stride" : 2
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu1",
+			"share" : true,
+			"input" : "conv1",
+			"negtive_slope" : -1
+		},
+
+		{
+			"type" : "max_pooling",
+			"name" : "pool1",
+			"input" : "relu1",
+			"size" : 2
+		},
+
+		{
+			"type" : "conv",
+			"name" : "conv2",
+			"input" : "pool1",
+			"kernel_size" : 5,
+			"kernel_num" : 128,
+			"kernel_stride" : 1
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu2",
+			"input" : "conv2",
+			"share" : true,
+			"negtive_slope" : -1
+		},
+
+		{
+			"type" : "max_pooling",
+			"name" : "pool2",
+			"input" : "relu2",
+			"size" : 2
+		},
+
+		{
+			"type" : "conv",
+			"name" : "conv3",
+			"input" : "pool2",
+			"kernel_size" : 5,
+			"kernel_num" : 256,
+			"kernel_stride" : 1
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu3",
+			"input" : "conv3",
+			"share" : true,
+			"negtive_slope" : -1
+		},
+
+		{
+			"type" : "max_pooling",
+			"name" : "pool3",
+			"input" : "relu3",
+			"size" : 2
+		},
+
+		{
+			"type" : "inner_product",
+			"name" : "fc1",
+			"inputs" : ["pool3"],
+			"output_num" : 2048
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu4",
+			"input" : "fc1",
+			"share" : false
+		},
+
+		{
+			"type" : "gru",
+			"name" : "gru1",
+			"input" : "relu4",
+			"output_num" : 2048
+		},
+
+		{
+			"type" : "relu",
+			"name" : "relu5",
+			"input" : "gru1",
+			"share" : false
+		},
+
+		{
+			"type" : "inner_product",
+			"name" : "fc2",
+			"inputs" : ["relu5"],
+			"output_num" : 37
+		},
+
+		{
+			"type" : "softmax_loss",
+			"name" : "softmax_loss",
+			"input" : "fc2"
+		},
+
+		{
+			"type" : "softmax",
+			"name" : "softmax",
+			"input" : "fc2"
+		}
+	],
+
+	"dict" :   ["eof","0","1","2","3","4","5","6","7","8","9",
+				"a","b","c","d","e","f","g","h","i","j","k",
+				"l","m","n","o","p","q","r","s","t","u","v",
+				"w","x","y","z"],
+
+	"train" : {
+		"setup_block" :  ["image_data","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax_loss"],
+		"activation" : [
+			["image_data","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax_loss"],
+			["gru1","relu5","fc2","softmax_loss"]
+		],
+		"loss" : "softmax_loss",
+		"data" : "image_data",
+		"stop_loss" : 0.05
+	},
+
+	"predict" : {
+		"setup_block" : ["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax"],
+		"activation" : [
+			["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax"],
+			["gru1","relu5","fc2","softmax"]
+		],
+		"input" : "data",
+		"output" : "softmax"
+	}
+}
