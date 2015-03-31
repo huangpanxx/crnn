@@ -65,7 +65,7 @@ void softmax_loss_layer::backward(int t) {
 
     OMP_FOR
     for (int i = 0; i < error.size(); ++i) {
-        error.at(i) = label.at2(t, i) - output.at(i);
+        error.at(i) += label.at2(t, i) - output.at(i);
     }
 }
 

@@ -32,8 +32,8 @@ bool tanh_layer::forward(int t){
         float x = input.at(i);
         float q = x>0 ? exp(-x) : exp(x);
         float v = q*q;
-        if (x > 0) { v = (v - 1) / (v + 1); }
-        else{ v = (1 - v) / (1 + v); }
+        if (x < 0) { v = (v - 1) / (v + 1); }
+        else{ v = (1 - v) / (v + 1); }
         output.at(i) = v;
         mid.at(i) = q;
     }

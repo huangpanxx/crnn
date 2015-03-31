@@ -365,13 +365,14 @@ void test_gru_layer(){
     auto input_block = block::new_block();
     auto output_block = block::new_block();
     auto label_block = block::new_block();
-    layer_ptr layer1(new gru_layer(input_block, output_block, 3));
+    layer_ptr layer1(new gru_layer(input_block, output_block, 2));
+    layer1->set_learn_rate(0.0001f);
     //layer_ptr layer1(new inner_product_layer(input_block, output_block, 3));
     layer_ptr layer2(new softmax_loss_layer(output_block, label_block));
     ((softmax_loss_layer*) layer2.get())->set_report(true);
 
     input_block->resize(1);
-    label_block->resize(3, 3);
+    label_block->resize(2, 2);
 
     vector<layer_ptr> layers = { layer1, layer2 };
     setup_block(layers);
@@ -379,7 +380,7 @@ void test_gru_layer(){
 
    input_block->clear(0);
    label_block->clear(0);
-   for (int i = 0; i < 3; ++i){
+   for (int i = 0; i < label_block->dims()[0]; ++i){
        array2d arr = label_block->signal();
        arr.at2(i, i) = 1;
    }
@@ -392,7 +393,7 @@ void test_gru_layer(){
        }
 
        vector<pair<layer_ptr,int> > history;
-       for (int i = 0; i < 1; ++i){
+       for (int i = 0; i < label_block->dims()[0]; ++i){
            for (auto& layer : layers){
                layer->forward(i);
                history.push_back({ layer, i });
@@ -422,8 +423,8 @@ int main(int argc, char **argv) {
     //test_mlp();
     //test_omp();
     //cout << (int) (2147483648) << endl;
-    test_gru_layer();
-    return 0;
+    //test_gru_layer();
+    //return 0;
 
     string model_file = "";
     if (argc == 2) {

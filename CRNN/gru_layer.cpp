@@ -108,6 +108,7 @@ bool gru_layer::begin_seq(){
     for (auto& layer : m_layers){
         layer->begin_seq();
     }
+
     return true;
 }
 
@@ -122,6 +123,7 @@ void gru_layer::backward(int t) {
     for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it){
         (*it)->backward(t);
     }
+
 }
 
 void gru_layer::end_batch(int size) {

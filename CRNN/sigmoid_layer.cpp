@@ -24,9 +24,11 @@ bool sigmoid_layer::forward(int t) {
     auto& output = this->m_output_block->new_signal();
     auto& input = this->m_input_block->signal();
 
+    OMP_FOR
     for (int i = 0; i < input.size(); ++i) {
         output.at(i) = sigmoid(input.at(i));
     }
+
     this->m_output_history.push_back(output);
     return true;
 }
@@ -36,11 +38,13 @@ void sigmoid_layer::backward(int t) {
     auto& oerror = this->m_output_block->error();
     auto& output = this->m_output_history.back();
 
+    OMP_FOR
     for (int i = 0; i < ierror.size(); ++i){
         ierror.at(i) += oerror.at(i) * output.at(i) * (1 - output.at(i));
     }
-    this->m_output_history.pop_back();
+
     oerror.clear(0);
+    this->m_output_history.pop_back();
 }
 
 bool sigmoid_layer::begin_seq() {
