@@ -25,12 +25,10 @@ network::network(const std::string& config, const std::string& plan) {
 
     //dict
     CHECK(m_config.contains("dict"));
-    auto dict = m_config.get("dict").get<picojson::object>();
-    for (auto key : dict){
-        int k = atoi(key.first.c_str());
-        CHECK(k >= 0);
-        string val = key.second.get<string>();
-        m_label_dict[k] = val;
+    auto dict = m_config.get("dict").get<picojson::array>();
+    for (int i = 0; i < (int) dict.size(); ++i) {
+        auto val = dict[i].get<string>();
+        m_label_dict[i] = val;
     }
 
     CHECK(m_config.contains(plan));

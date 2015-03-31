@@ -6,12 +6,9 @@
 using namespace std;
 
 vector<array_sample> load_images(const string& dirname,
-    const string& label_file, int width, int height){
+    const string& label_file, int width, int height, int label_size){
     ifstream fin(label_file);
     CHECK(fin);
-    int label_size;
-    fin >> label_size;
-    CHECK(label_size > 0);
     vector<array_sample> samples;
     int k = 0;
     while (fin) {
@@ -54,6 +51,7 @@ vector<array_sample> load_images(const string& dirname,
         array2d label((int) vlabel.size(), label_size);
         label.clear(0);
         for (int i = 0; i<(int) vlabel.size(); ++i){
+            CHECK(vlabel[i]<label_size && vlabel[i] >= 0);
             label.at2(i, vlabel[i]) = 1.0f;
         }
         samples.push_back(array_sample(image, label));
@@ -71,9 +69,12 @@ image_data_layer::image_data_layer(
     const string& label_file,
     shared_ptr<block> data,
     shared_ptr<block> label,
-    int batch, int iter, int loop,
+    int batch, int iter,
+    int loop, int label_size,
     int width, int height)
-    :array_layer(load_images(dirname, label_file, width, height), data, label, batch, iter,loop) {
+    :array_layer(
+    load_images(dirname, label_file, width, height, label_size),
+    data, label, batch, iter, loop) {
 }
 
 
@@ -84,6 +85,7 @@ layer_ptr create_image_layer(
     string label_file = config.get("label_file").get<string>();
     string data_dir = config.get("data_dir").get<string>();
     int batch = (int) config.get("batch").get<double>();
+    int label_size = (int) config.get("label_size").get<double>();
 
     //default iter = 1
     int iter = 1;
@@ -110,7 +112,7 @@ layer_ptr create_image_layer(
 
     return layer_ptr(
         new image_data_layer(data_dir, label_file,
-        data_block, label_block, batch, iter, loop, width, height));
+        data_block, label_block, batch, iter, loop, label_size, width, height));
 }
 
 REGISTER_LAYER(image_data, create_image_layer);

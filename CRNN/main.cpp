@@ -109,163 +109,6 @@ void test_mlp(){
     train(layer_seq, loss_layer, data_layer->batch());
 }
 
-void test_conv() {
-    auto data_block = block::new_block();
-    auto label_block = block::new_block();
-    auto conv1_block = block::new_block();
-    auto sig1_block = block::new_block();
-    auto conv2_block = block::new_block();
-    auto sig2_block = block::new_block();
-    auto fc1_block = block::new_block();
-    auto sig3_block = block::new_block();
-    auto fc2_block = block::new_block();
-    auto output_block = block::new_block();
-
-    shared_ptr<image_data_layer> data_layer(
-        new image_data_layer(
-        "data",
-        "label.txt",
-        data_block, label_block, 200, 30, 300));
-    data_layer->set_name("data");
-
-    shared_ptr<conv_layer> conv1_layer(
-        new conv_layer(data_block, conv1_block, 5, 20, 3));
-    conv1_layer->set_name("conv1");
-
-    shared_ptr<layer> sig1_layer(
-        new relu_layer(conv1_block, sig1_block));
-    sig1_layer->set_name("relu1");
-
-    shared_ptr<conv_layer> conv2_layer(
-        new conv_layer(sig1_block, conv2_block, 5, 30, 4));
-    conv2_layer->set_name("conv2");
-
-    shared_ptr<layer> sig2_layer(
-        new relu_layer(conv2_block, sig2_block));
-    sig2_layer->set_name("relu2");
-
-    shared_ptr<inner_product_layer> fc1_layer(
-        new inner_product_layer(sig2_block, fc1_block, 800));
-    fc1_layer->set_name("fc1.1");
-
-    shared_ptr<layer> sig3_layer(
-        new relu_layer(fc1_block, sig3_block));
-    sig3_layer->set_name("relu3");
-
-
-    int output = data_layer->label_dims()[1];
-    shared_ptr<inner_product_layer> fc2_layer(
-        new inner_product_layer(sig3_block, fc2_block, output));
-    fc2_layer->set_name("fc2.1");
-
-    shared_ptr<softmax_loss_layer> loss_layer(
-        new softmax_loss_layer(fc2_block, label_block));
-    loss_layer->set_name("loss");
-
-    shared_ptr<softmax_layer> output_layer(
-        new softmax_layer(fc2_block, output_block));
-    output_layer->set_name("output");
-
-    vector<shared_ptr<layer> > train_layer_seq;
-    train_layer_seq.push_back(data_layer);
-    train_layer_seq.push_back(conv1_layer);
-    train_layer_seq.push_back(sig1_layer);
-    train_layer_seq.push_back(conv2_layer);
-    train_layer_seq.push_back(sig2_layer);
-    train_layer_seq.push_back(fc1_layer);
-    train_layer_seq.push_back(sig3_layer);
-    train_layer_seq.push_back(fc2_layer);
-    train_layer_seq.push_back(loss_layer);
-
-    vector<shared_ptr<layer> > pred_layer_seq;
-    pred_layer_seq.push_back(conv1_layer);
-    pred_layer_seq.push_back(sig1_layer);
-    pred_layer_seq.push_back(conv2_layer);
-    pred_layer_seq.push_back(sig2_layer);
-    pred_layer_seq.push_back(fc1_layer);
-    pred_layer_seq.push_back(sig3_layer);
-    pred_layer_seq.push_back(fc2_layer);
-    pred_layer_seq.push_back(output_layer);
-
-    //load
-    string model_file = "model.bin";
-    ifstream fin(model_file, ios::in | ios::binary);
-    if (fin) {
-        load_layers(fin, build_name_layer_map(train_layer_seq));
-    }
-    fin.close();
-
-
-    bool is_train = true;
-    while (true){
-        cout << "y for predict, n for train(y/n):";
-        string ans;
-        cin >> ans;
-        if (ans == "y" || ans == "n"){
-            is_train = (ans == "n");
-            break;
-        }
-    }
-
-    if (is_train){
-        for (int i = 0; i < (int) train_layer_seq.size(); ++i) {
-            train_layer_seq[i]->set_learn_rate(0.015f + (::rand() / RAND_MAX)*0.01f);
-            train_layer_seq[i]->set_momentum_decay(8.0f);
-        }
-        //loss_layer->set_report(true);
-        //train
-        setup_block(train_layer_seq);
-        setup_params(train_layer_seq);
-        train(train_layer_seq, loss_layer, data_layer->batch(),
-            [&model_file, &train_layer_seq, &loss_layer, &data_layer](int epoch) {
-            const int snapshot = 20;
-            //save
-            if (epoch % snapshot == (snapshot - 1)) {
-                cout << "save model ..." << endl;
-                ofstream fout(model_file, ios::out | ios::binary);
-                save_layers(fout, build_name_layer_map(train_layer_seq));
-            }
-            if (loss_layer->loss() <= 0.08f) {
-                cout << "move to next batch" << endl;
-                data_layer->move_to_next_batch();
-                for (auto layer : train_layer_seq) {
-                    layer->set_learn_rate(0.01f);
-                }
-            }
-        });
-    }
-    else {
-        while (true){
-            cout << "image path:";
-            string img_path;
-            cin >> img_path;
-            CHECK(!img_path.empty());
-
-            array3d img = imread(img_path);
-            CHECK(img.size() != 0);
-            data_block->resize(img.dims());
-            data_block->signal() = img;
-            setup_block(pred_layer_seq);
-            setup_params(pred_layer_seq);
-            for (auto layer : pred_layer_seq){
-                layer->begin_seq();
-            }
-            for (auto layer : pred_layer_seq){
-                layer->forward(0);
-            }
-            auto &signal = output_block->signal();
-            cout << signal << endl;
-            int label = 0;
-            for (int i = 0; i < signal.size(); ++i) {
-                if (signal.at(i)>signal.at(label)) {
-                    label = i;
-                }
-            }
-            cout << "label: " << label << endl;
-        }
-    }
-}
-
 void test_stream(){
     string model_file = "C:/Users/snail/Desktop/test.bin";
     ofstream fout(model_file, ios::out | ios::binary);
@@ -294,7 +137,7 @@ void test_omp(){
 }
 
 void test_network(const string& filename) {
-    printf("load file %s.\n", filename.c_str());
+    ::printf("load file %s.\n", filename.c_str());
     string json = read_file(filename);
 
     bool is_train = yes_no("train or predict");
@@ -321,31 +164,48 @@ void test_network(const string& filename) {
             //recongnize
             int start_time = clock();
             predict_net.set_input(image);
-            array _output = predict_net.forward();
 
-            //get 2d output
-            array2d output(0, 0);
-            if (_output.dim() == 1) {
-                output = array2d(1, _output.size());
-                output.copy(_output);
-            }
-            else if (_output.dim() == 2) {
-                output = _output;
-            }
-            else{ CHECK(false); }
 
-            //translate
+
+            //read output
             string ans = "";
-            for (int i = 0; i < output.rows(); ++i) {
-                int k = output.arg_max_row(i);
-                ans += predict_net.translate(k);
-                printf("%.3f ", output.at2(i, k));
+
+            for (int i = 0;; ++i) {
+                //forward
+                array output = predict_net.forward();
+                //dim == 1
+                if (output.dim() == 1) {
+                    int k = output.arg_max();
+                    string label = predict_net.translate(k);
+                    if (label == "eof") {
+                        break;
+                    }
+                    if (i >= 20){
+                        ::printf("seq is too long!\n");
+                        break;
+                    }
+                    ans += label;
+                    ::printf("%.3f ", output.at(k));
+                }
+                //dim == 2
+                if (output.dim() == 2) {
+                    array2d output2d = output;
+                    for (int i = 0; i < output2d.rows(); ++i) {
+                        int k = output2d.arg_max_row(i);
+                        ans += predict_net.translate(k);
+                        ::printf("%.3f ", output2d.at2(i, k));
+                    }
+                    break;
+                }
+                //dim > 2
+                CHECK(output.dim() <= 2);
             }
-            printf("\n");
+
+            ::printf("\n");
 
             //print info
             float freq = 1.0f * CLOCKS_PER_SEC / (clock() - start_time);
-            printf("result: %s, speed %.3f/s\n", ans.c_str(), freq);
+            ::printf("result: %s, speed %.3f/s\n", ans.c_str(), freq);
         }
     }
 }
