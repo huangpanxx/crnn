@@ -1,8 +1,8 @@
 {
 	"model" : "conv3-fc2-gru.bin",
-	"save_epoch" : 50,
+	"save_epoch" : 20,
 	"input_dims" : [65,140,3],
-	"learn_rate" : 0.01,
+	"learn_rate" : 0.02,
 
 	"layers" : [
 		{
@@ -12,7 +12,7 @@
 			"data_dir" : "data",
 			"width" : 140,
 			"height" : 65,
-			"batch" : 100,
+			"batch" : 15,
 			"label_size" : 37,
 			"loop" : 10000
 		},
@@ -23,7 +23,8 @@
 			"input" : "data",
 			"kernel_size" : 7,
 			"kernel_num" : 64,
-			"kernel_stride" : 2
+			"kernel_stride" : 2,
+			"enable_bp" : false
 		},
 
 		{
@@ -111,16 +112,16 @@
 		},
 
 		{
-			"type" : "relu",
-			"name" : "relu5",
+			"type" : "gru",
+			"name" : "gru2",
 			"input" : "gru1",
-			"share" : false
+			"output_num" : 2048
 		},
 
 		{
 			"type" : "inner_product",
 			"name" : "fc2",
-			"inputs" : ["relu5"],
+			"inputs" : ["gru2"],
 			"output_num" : 37
 		},
 
@@ -143,10 +144,10 @@
 				"w","x","y","z"],
 
 	"train" : {
-		"setup_block" :  ["image_data","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax_loss"],
+		"setup_block" :  ["image_data","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","gru2","fc2","softmax_loss"],
 		"activation" : [
-			["image_data","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax_loss"],
-			["gru1","relu5","fc2","softmax_loss"]
+			["image_data","conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","gru2","fc2","softmax_loss"],
+			["gru1","gru2","fc2","softmax_loss"]
 		],
 		"loss" : "softmax_loss",
 		"data" : "image_data",
@@ -154,10 +155,10 @@
 	},
 
 	"predict" : {
-		"setup_block" : ["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax"],
+		"setup_block" : ["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","gru2","fc2","softmax"],
 		"activation" : [
-			["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","relu5","fc2","softmax"],
-			["gru1","relu5","fc2","softmax"]
+			["conv1","relu1","pool1","conv2","relu2","pool2","conv3","relu3","pool3","fc1","relu4","gru1","gru2","fc2","softmax"],
+			["gru1","gru2","fc2","softmax"]
 		],
 		"input" : "data",
 		"output" : "softmax"

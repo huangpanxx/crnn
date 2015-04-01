@@ -23,36 +23,6 @@ inline unordered_map<long, stack<float*> > &get_freed_mem() {
     return map;
 }
 
-
-float* alloc_array(long size) {
-    //lock
-    auto& mutex = get_mem_mutex();
-    mutex.lock();
-
-    //get freed block
-    auto& map = get_freed_mem();
-    auto& it = map.find(size);
-
-    if (it == map.end() || it->second.size() == 0){
-        //no freed block
-        auto pt = new float[size];
-        auto& am = get_allocated_mem();
-        am[pt] = size;
-        //return new block
-        mutex.unlock();
-        return pt;
-    }
-    else {
-        //get and pop block
-        auto mem = it->second.top();
-        it->second.pop();
-
-        //return this block
-        mutex.unlock();
-        return mem;
-    }
-}
-
 void free_array(float* pt) {
     //lock
     auto& mutex = get_mem_mutex();
@@ -78,6 +48,50 @@ void free_array(float* pt) {
     //unlock
     mutex.unlock();
 }
+
+
+float* alloc_array(long size) {
+    //lock
+    auto& mutex = get_mem_mutex();
+    mutex.lock();
+
+    //get freed block
+    auto& map = get_freed_mem();
+    auto& it = map.find(size);
+
+    if (it == map.end() || it->second.size() == 0){
+        //no freed block
+        const int times = 50;
+        auto pt = new float[size*times]; //allocate 50 times memory
+
+        //recored pointers
+        auto& am = get_allocated_mem();
+        for (int i = 0; i < times; ++i){
+            am[pt + i*size] = size;
+        }
+
+        mutex.unlock();
+
+        //free unused
+        for (int i = 1; i < times; ++i){
+            free_array(pt + i*size);
+        }
+
+        //return new block
+        return pt;
+    }
+    else {
+        //get and pop block
+        auto mem = it->second.top();
+        it->second.pop();
+
+        //return this block
+        mutex.unlock();
+        return mem;
+    }
+}
+
+
 
 //=========================== array =============================
 
