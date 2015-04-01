@@ -122,10 +122,12 @@ public:
     }
 
     array& operator=(const array& b) {
-        destroy();
-        this->m_pmeta = b.m_pmeta;
-        this->m_pmeta->counter += 1;
-        copy_meta();
+        if (this != &b) {
+            destroy();
+            this->m_pmeta = b.m_pmeta;
+            this->m_pmeta->counter += 1;
+            copy_meta();
+        }
         return *this;
     };
 
@@ -155,8 +157,8 @@ public:
 
     int arg_max(){
         CHECK(size() > 0);
-        int k = 0;
-        for (int i = 1; i < size(); ++i){
+        int k = 0, sz = size();
+        for (int i = 1; i < sz; ++i){
             if (at(k) < at(i)) k = i;
         }
         return k;
