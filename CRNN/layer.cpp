@@ -14,6 +14,7 @@ std::map<string, layer_factory_fn>& get_layer_fns(){
 }
 
 void register_layer_factory(string name, layer_factory_fn fn){
+    printf("layer %s registed.\n", name.c_str());
     get_layer_fns()[name] = fn;
 }
 
