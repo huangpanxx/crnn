@@ -3,7 +3,7 @@
 using namespace std;
 
 
-//int main(int argc, char **argv) {
+int main(int argc, char **argv) {
 //    string model_file = "";
 //    if (argc == 2) {
 //        model_file = argv[1];
@@ -14,4 +14,4 @@ using namespace std;
 //    test_network(model_file);
 //    system("pause");
 //    return 0;
-//}
+}

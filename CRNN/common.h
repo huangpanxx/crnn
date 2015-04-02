@@ -44,7 +44,4 @@ inline void TIME(std::string info, std::function<void()> f) {
     std::cout << info << ":" << clock() - start << std::endl;
 }
 
-//you need reference this var
-extern bool CRNN_INITIALIZER; 
-
 #endif
