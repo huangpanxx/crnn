@@ -6,7 +6,7 @@
 class multi_softmax_layer : public layer{
 public:
     multi_softmax_layer(
-        std::vector<block_ptr> &input_blocks,
+        const std::vector<block_ptr> &input_blocks,
         block_ptr &output_block);
 
     virtual void setup_block();

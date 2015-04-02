@@ -63,8 +63,8 @@ layer_factory_fn get_layer_factory(std::string name);
 #define REGISTER_LAYER(name,fn) \
     bool name##_layer_create_fn() { \
     register_layer_factory(#name, fn); \
-    return 1; \
+    return true; \
     }\
-    bool name##_layer_create_var = name##_layer_create_fn();
+    static bool name##_layer_create_var = name##_layer_create_fn();
 
 #endif

@@ -7,7 +7,6 @@
 using namespace System;
 
 namespace CRNNnet {
-
 	public ref class Network
 	{
     public:

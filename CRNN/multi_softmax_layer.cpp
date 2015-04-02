@@ -4,7 +4,7 @@
 using namespace std;
 
 multi_softmax_layer::multi_softmax_layer(
-    vector<block_ptr> &input_blocks,
+    const vector<block_ptr> &input_blocks,
     block_ptr &output_block){
     this->m_input_blocks = input_blocks;
     this->m_output_block = output_block;
