@@ -148,13 +148,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FloatArray.h" />
     <ClInclude Include="Network.h" />
-    <ClInclude Include="Utility.h" />
+    <ClInclude Include="CRNNHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="FloatArray.cpp" />
     <ClCompile Include="Network.cpp" />
-    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="CRNNHelper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

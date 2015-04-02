@@ -1,39 +1,33 @@
 #include "Network.h"
 #include "../CRNN/test.h"
-#include <msclr/marshal_cppstd.h>
+#include "CRNNHelper.h"
 using namespace CRNNnet;
 using namespace std;
+using namespace System;
 
-string MarshalString(String ^ s) {
-    using namespace Runtime::InteropServices;
-    const char* chars = (const char*) (Marshal::StringToHGlobalAnsi(s)).ToPointer();
-    string os = chars;
-    Marshal::FreeHGlobal(IntPtr((void*) chars));
-    return os;
-}
 
 void Network::TrainAndTestNetwork(String^ filename) {
-    string stdfilename = MarshalString(filename);
+    string stdfilename = CRNNHelper::MarshalString(filename);
     train_and_test_network(stdfilename);
 }
 
 Network::Network(String^ json, String^ plan){
-    string sjson = MarshalString(json);
-    string splan = MarshalString(plan);
+    string sjson = CRNNHelper::MarshalString(json);
+    string splan = CRNNHelper::MarshalString(plan);
     this->m_pnetwork = new network(sjson, splan);
 }
 
-void Network::set_input(const arraykd& data){
-    this->m_pnetwork->set_input(data);
+void Network::set_input(const FloatArray^ data){
 }
 
-arraykd Network::forward(){
-    return this->m_pnetwork->forward();
+FloatArray^ Network::forward(){
+    arraykd arr = this->m_pnetwork->forward();
+    return gcnew FloatArray(arr);
 }
 
 String^ Network::translate(int k){
     auto ans = this->m_pnetwork->translate(k);
-    return msclr::interop::marshal_as<String^>(ans);
+    return gcnew String(ans.c_str());
 }
 
 array<int>^ Network::input_dims() {
@@ -44,7 +38,6 @@ array<int>^ Network::input_dims() {
     }
     return arr;
 }
-
 
 Network::~Network() {
     delete this->m_pnetwork;
