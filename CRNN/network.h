@@ -17,8 +17,8 @@ public:
     void train();
 
     //predict
-    void set_input(const array& data);
-    array forward();
+    void set_input(const arraykd& data);
+    arraykd forward();
 
     //dict
     const std::string& translate(int k) {

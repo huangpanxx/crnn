@@ -32,7 +32,7 @@ bool multi_softmax_loss_layer::begin_seq() {
 
 
 bool multi_softmax_loss_layer::forward(int t) {
-    vector<array> outputs;
+    vector<arraykd> outputs;
     for (auto& block : m_input_blocks){
         auto& input = block->signal();
         auto& output = block->signal().clone(false);

@@ -16,7 +16,7 @@ public:
 private:
     std::shared_ptr<block> m_input_block;
     std::shared_ptr<block> m_output_block;
-    std::vector<array> m_output_history;
+    std::vector<arraykd> m_output_history;
 
     float sigmoid(float x) {
         if (x > 20) return  0.999999f;

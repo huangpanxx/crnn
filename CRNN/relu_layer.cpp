@@ -24,7 +24,7 @@ void  relu_layer::setup_block() {
 void relu_layer::setup_params() {
     const int sz = m_share ? 1 : this->m_input_block->size();
     if (m_negtive_slop.size() == 0){
-        this->m_negtive_slop = array(sz);
+        this->m_negtive_slop = arraykd(sz);
         this->m_negtive_slop.clear(0.1f);
     }
     CHECK(m_negtive_slop.size() == sz);

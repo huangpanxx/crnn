@@ -39,13 +39,13 @@ std::vector<T1> convert_arrays(const std::vector<T2>& arrs){
 }
 
 
-void write_array_to_stream(std::ostream& os, const array& arr);
+void write_array_to_stream(std::ostream& os, const arraykd& arr);
 
-array read_array_from_stream(std::istream& is);
+arraykd read_array_from_stream(std::istream& is);
 
-void write_arrays_to_stream(std::ostream& os, const std::vector<array>& arrs);
+void write_arrays_to_stream(std::ostream& os, const std::vector<arraykd>& arrs);
 
-std::vector<array> read_arrays_from_stream(std::istream& is);
+std::vector<arraykd> read_arrays_from_stream(std::istream& is);
 
 std::map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
     const std::vector<std::shared_ptr<layer> > &layers);
@@ -62,8 +62,8 @@ bool yes_no(const std::string& promote);
 
 std::string promote_file_name(const std::string& promote);
 
-void softmax_normalize(const array& src, array& dst);
+void softmax_normalize(const arraykd& src, arraykd& dst);
 
-void softmax_normalize(const array& src, array2d& dst, int row);
+void softmax_normalize(const arraykd& src, array2d& dst, int row);
 
 #endif

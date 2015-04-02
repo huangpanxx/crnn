@@ -3,6 +3,6 @@
 
 #include "common.h"
 
-void test_network(const std::string& filename);
+void train_and_test_network(const std::string& filename);
 
 #endif

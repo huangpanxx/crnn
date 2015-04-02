@@ -12,20 +12,28 @@ namespace CRNN.gui
         [STAThread]
         static void Main()
         {
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new MainForm());
-            MyMain();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            MyMain(Environment.GetCommandLineArgs());
         }
 
-        static void MyMain()
+        static void MyMain(string[] args)
         {
-            Console.Write("model:");
-            string filename = Console.ReadLine();
+            string filename = "";
+            if (args.Length != 2)
+            {
+                Console.Write("model:");
+                filename = Console.ReadLine();
+            }
+            else
+            {
+                filename = args[1];
+            }
             if (File.Exists(filename))
             {
                 Network.TestNetwork(filename);
             }
+            //Application.Run(new MainForm());
         }
     }
 }

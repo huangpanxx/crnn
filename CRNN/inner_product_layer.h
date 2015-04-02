@@ -37,13 +37,13 @@ private:
     std::vector<std::shared_ptr<block> > m_input_blocks;
     std::shared_ptr<block> m_output_block;
 
-    std::vector<std::vector<array> > m_inputs_history;
+    std::vector<std::vector<arraykd> > m_inputs_history;
 
     std::vector<array2d> m_weights;
-    array m_bias;
+    arraykd m_bias;
 
     std::vector<array2d> m_grad_weights;
-    array m_grad_bias;
+    arraykd m_grad_bias;
 };
 
 #endif

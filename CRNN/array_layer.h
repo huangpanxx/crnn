@@ -6,15 +6,15 @@
 
 class array_sample {
 public:
-    array_sample(const array& data, const array& label){
+    array_sample(const arraykd& data, const arraykd& label){
         this->m_data = data;
         this->m_label = label;
     }
-    array& data() { return m_data; }
-    array& label() { return m_label; }
+    arraykd& data() { return m_data; }
+    arraykd& label() { return m_label; }
 private:
-    array m_data;
-    array m_label;
+    arraykd m_data;
+    arraykd m_label;
 };
 
 //samples must be sure have the same dims(no check in this layer)

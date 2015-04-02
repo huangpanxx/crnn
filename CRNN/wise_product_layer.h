@@ -16,7 +16,7 @@ private:
     block_ptr m_input_block1;
     block_ptr m_input_block2;
     block_ptr m_output_block;
-    std::vector<std::pair<array, array> > m_input_history;
+    std::vector<std::pair<arraykd, arraykd> > m_input_history;
 };
 
 #endif

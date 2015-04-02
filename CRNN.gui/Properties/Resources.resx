@@ -23,7 +23,7 @@
         <value>[base64 mime encoded serialized .NET Framework object]</value>
     </data>
     <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <value>[base64 mime encoded string representing a byte arraykd form of the .NET Framework object]</value>
         <comment>This is a comment</comment>
     </data>
                 
@@ -55,7 +55,7 @@
             : and then encoded with base64 encoding.
 
     mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
+    value   : The object must be serialized into a byte arraykd 
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->

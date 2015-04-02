@@ -42,7 +42,7 @@ void inner_product_layer::setup_block() {
 void inner_product_layer::setup_params(){
     //bias
     if (this->m_bias.size() == 0) {
-        this->m_bias = array(m_output_num);
+        this->m_bias = arraykd(m_output_num);
         this->m_bias.rand(-0.5f, 0.5f);
     }
     else {
@@ -76,7 +76,7 @@ void inner_product_layer::setup_params(){
 
 bool inner_product_layer::forward(int t) {
     //input signals
-    std::vector<array> inputs;
+    std::vector<arraykd> inputs;
     for (auto &arr : m_input_blocks){
         inputs.push_back(arr->signal());
     }
@@ -158,7 +158,7 @@ bool inner_product_layer::begin_seq() {
 
 void inner_product_layer::save(std::ostream& os) {
     write_val_to_stream(os, this->m_output_num);
-    write_arrays_to_stream(os, convert_arrays<array>(this->m_weights));
+    write_arrays_to_stream(os, convert_arrays<arraykd>(this->m_weights));
     write_array_to_stream(os, this->m_bias);
 }
 

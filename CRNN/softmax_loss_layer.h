@@ -32,7 +32,7 @@ public:
 private:
     std::shared_ptr<block> m_input_block;
     std::shared_ptr<block> m_label_block;
-    std::vector<array> m_output_history;
+    std::vector<arraykd> m_output_history;
     float m_loss_sum;
     int m_loss_num;
     bool m_report;

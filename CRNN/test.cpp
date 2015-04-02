@@ -19,7 +19,7 @@
 using namespace std;
 
 //void test_xor() {
-//    array s1(2), s2(2), s3(2), s4(2);
+//    arraykd s1(2), s2(2), s3(2), s4(2);
 //    array2d l1(1, 2), l2(1, 2), l3(1, 2), l4(1, 2);
 //    s1.at(0) = 0, s1.at(1) = 1; l1.at(0) = 0; l1.at(1) = 1;
 //    s2.at(0) = 1, s2.at(1) = 0; l2.at(0) = 0; l2.at(1) = 1;
@@ -136,7 +136,7 @@ using namespace std;
 //    }
 //}
 
-void test_network(const string& filename) {
+void train_and_test_network(const string& filename) {
     ::printf("load file %s.\n", filename.c_str());
     string json = read_file(filename);
 
@@ -173,7 +173,7 @@ void test_network(const string& filename) {
 
             for (int i = 0;; ++i) {
                 //forward
-                array output = predict_net.forward();
+                arraykd output = predict_net.forward();
                 //dim == 1
                 if (output.dim() == 1) {
                     int k = output.arg_max();

@@ -93,9 +93,9 @@ float* alloc_array(long size) {
 
 
 
-//=========================== array =============================
+//=========================== arraykd =============================
 
-int array::new_id(){
+int arraykd::new_id(){
     auto& g_mem_mutex = get_mem_mutex();
     static int sid = -1;
     g_mem_mutex.lock();
@@ -105,14 +105,14 @@ int array::new_id(){
 }
 
 
-array::array(int size) {
+arraykd::arraykd(int size) {
     init(size);
     this->m_pmeta->dim = 1;
     this->m_pmeta->dimk[0] = size;
     copy_meta();
 }
 
-array::array(const std::vector<int> dims) {
+arraykd::arraykd(const std::vector<int> dims) {
     assert(dims.size() != 0);
     assert(dims.size() < 20);
     int size = 1;
@@ -129,17 +129,17 @@ array::array(const std::vector<int> dims) {
 
 
 
-void array::init(int size) {
+void arraykd::init(int size) {
     const int offset = sizeof(array_meta) / sizeof(float) +1;
     float* pmem = alloc_array(size + offset);
     this->m_pmeta = (array_meta*) pmem;
     this->m_pmeta->data = pmem + offset;
-    this->m_pmeta->id = array::new_id();
+    this->m_pmeta->id = arraykd::new_id();
     this->m_pmeta->size = size;
     this->m_pmeta->counter = 1;
 }
 
-array::array(const array& arr) {
+arraykd::arraykd(const arraykd& arr) {
     auto& g_mem_mutex = get_mem_mutex();
     this->m_pmeta = arr.m_pmeta;
     g_mem_mutex.lock();
@@ -148,11 +148,11 @@ array::array(const array& arr) {
     this->copy_meta();
 }
 
-array::~array() {
+arraykd::~arraykd() {
     destroy();
 }
 
-void array::destroy(){
+void arraykd::destroy(){
     auto& g_mem_mutex = get_mem_mutex();
     g_mem_mutex.lock();
     this->m_pmeta->counter -= 1;

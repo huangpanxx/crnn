@@ -27,11 +27,11 @@ public:
         this->m_weights = weights;
     }
 
-    array bias() {
+    arraykd bias() {
         return m_bias;
     }
 
-    void set_bias(const array& bias){
+    void set_bias(const arraykd& bias){
         this->m_bias = bias;
     }
 
@@ -43,10 +43,10 @@ private:
     block_ptr m_output_block;
 
     std::vector<array3d> m_weights;
-    array m_bias;
+    arraykd m_bias;
 
     std::vector<array3d> m_grad_weights;
-    array m_grad_bias;
+    arraykd m_grad_bias;
 
     std::vector<array3d> m_input_history;
 

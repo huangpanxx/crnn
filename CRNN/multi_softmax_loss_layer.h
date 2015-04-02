@@ -21,7 +21,7 @@ public:
 
 private:
     std::vector<block_ptr> m_input_blocks;
-    std::vector<std::vector<array> > m_output_history;
+    std::vector<std::vector<arraykd> > m_output_history;
     block_ptr m_label_block;
     float m_loss_sum;
     int m_loss_num;

@@ -274,14 +274,14 @@ void network::train() {
     printf("train finished.\n");
 }
 
-void network::set_input(const array& data){
+void network::set_input(const arraykd& data){
     CHECK(m_input_block_id != "");
     auto &input = this->m_block_factory.get_block(this->m_input_block_id);
     input->signal().copy(data);
     this->m_t = 0;
 }
 
-array network::forward(){
+arraykd network::forward(){
     vector<layer_ptr> acti_seq;
 
     //select acti seq

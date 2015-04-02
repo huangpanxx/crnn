@@ -68,7 +68,7 @@ void read_magic_number(std::istream& is){
     CHECK(magic == BEGIN_MAGIC_NUMBER);
 }
 
-void write_array_to_stream(std::ostream& os, const array& arr) {
+void write_array_to_stream(std::ostream& os, const arraykd& arr) {
     write_magic_number(os);
     write_val_to_stream(os, (int) arr.size());
     write_val_to_stream(os, (int) arr.dim());
@@ -80,7 +80,7 @@ void write_array_to_stream(std::ostream& os, const array& arr) {
     }
 }
 
-array read_array_from_stream(std::istream& is) {
+arraykd read_array_from_stream(std::istream& is) {
     read_magic_number(is);
     int size = read_val_from_stream<int>(is);
     int dims = read_val_from_stream<int>(is);
@@ -88,7 +88,7 @@ array read_array_from_stream(std::istream& is) {
     for (int i = 0; i < dims; ++i) {
         vdim.push_back(read_val_from_stream<int>(is));
     }
-    array arr(vdim);
+    arraykd arr(vdim);
     for (int i = 0; i < size; ++i) {
         arr.at(i) = read_val_from_stream<float>(is);
     }
@@ -97,7 +97,7 @@ array read_array_from_stream(std::istream& is) {
 
 
 
-void write_arrays_to_stream(std::ostream& os, const std::vector<array>& arrs) {
+void write_arrays_to_stream(std::ostream& os, const std::vector<arraykd>& arrs) {
     write_magic_number(os);
     write_val_to_stream(os, (int) arrs.size());
     for (int i = 0; i < (int) arrs.size(); ++i){
@@ -105,12 +105,12 @@ void write_arrays_to_stream(std::ostream& os, const std::vector<array>& arrs) {
     }
 }
 
-std::vector<array> read_arrays_from_stream(std::istream& is) {
+std::vector<arraykd> read_arrays_from_stream(std::istream& is) {
     read_magic_number(is);
     int size = read_val_from_stream<int>(is);
-    vector<array> arrs;
+    vector<arraykd> arrs;
     for (int i = 0; i < size; ++i){
-        array arr = read_array_from_stream(is);
+        arraykd arr = read_array_from_stream(is);
         arrs.push_back(arr);
     }
     return arrs;
@@ -219,7 +219,7 @@ std::string promote_file_name(const std::string& promote){
     return file_name;
 }
 
-void softmax_normalize(const array& src, array& dst) {
+void softmax_normalize(const arraykd& src, arraykd& dst) {
     assert(src.size() == dst.size());
     int sz = src.size();
     const float mmax = src.max();
@@ -230,7 +230,7 @@ void softmax_normalize(const array& src, array& dst) {
     dst.mul(1.0f / dst.sum());
 }
 
-void softmax_normalize(const array& src, array2d& dst, int row){
+void softmax_normalize(const arraykd& src, array2d& dst, int row){
     assert(src.size() == dst.cols());
     assert(row >= 0 && row < dst.rows());
     int sz = src.size();

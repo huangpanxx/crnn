@@ -23,14 +23,14 @@ struct array_meta {
     int dimk[20];
 };
 
-class array {
+class arraykd {
 public:
-    array() : array(0) { };
-    array(int size);
-    array(const std::vector<int> dims);
-    array(const array& b);
+    arraykd() : arraykd(0) { };
+    arraykd(int size);
+    arraykd(const std::vector<int> dims);
+    arraykd(const arraykd& b);
 
-    virtual ~array();
+    virtual ~arraykd();
 
     inline int dim() const {
         return this->m_dim;
@@ -52,7 +52,7 @@ public:
     }
     inline int size() const { return this->m_size; }
     inline float* data() const { return this->m_data; }
-    bool operator ==(const array& b) const { return b.data() == data(); }
+    bool operator ==(const arraykd& b) const { return b.data() == data(); }
 
     inline float& at(int pos) const {
         assert(pos >= 0 && pos < size());
@@ -75,7 +75,7 @@ public:
         }
     }
 
-    void mul_add(const array& src, float v) {
+    void mul_add(const arraykd& src, float v) {
         assert(src.size() == this->size());
         int sz = this->size();
         OMP_FOR
@@ -84,7 +84,7 @@ public:
         }
     }
 
-    void add(const array& src) {
+    void add(const arraykd& src) {
         assert(src.size() == this->size());
         OMP_FOR
         for (int i = 0; i < this->size(); ++i){
@@ -109,9 +109,9 @@ public:
         }
     }
 
-    array clone(bool is_copy_data = false) {
+    arraykd clone(bool is_copy_data = false) {
         //allocate
-        array new_arr(this->dims());
+        arraykd new_arr(this->dims());
 
         //copy
         if (is_copy_data) {
@@ -121,7 +121,7 @@ public:
         return new_arr;
     }
 
-    array& operator=(const array& b) {
+    arraykd& operator=(const arraykd& b) {
         if (this != &b) {
             destroy();
             this->m_pmeta = b.m_pmeta;
@@ -131,7 +131,7 @@ public:
         return *this;
     };
 
-    void copy(const array& src) {
+    void copy(const arraykd& src) {
         copy_data(src, *this);
     }
 
@@ -181,7 +181,7 @@ private:
     void init(int size);
     void destroy();
 
-    static void copy_data(const array& src, array& dst){
+    static void copy_data(const arraykd& src, arraykd& dst){
         assert(src.size() == dst.size());
         OMP_FOR
         for (int i = 0; i < src.size(); ++i){
@@ -192,7 +192,7 @@ private:
     static int new_id();
 };
 
-inline std::ostream& operator <<(std::ostream& os, const array& arr) {
+inline std::ostream& operator <<(std::ostream& os, const arraykd& arr) {
     for (int i = 0; i < arr.size(); ++i){
         if (i != 0) os << ", ";
         os << arr.at(i);
@@ -200,15 +200,15 @@ inline std::ostream& operator <<(std::ostream& os, const array& arr) {
     return os;
 }
 
-class array2d : public array {
+class array2d : public arraykd {
 public:
-    array2d(int rows, int cols) : array(rows*cols) {
+    array2d(int rows, int cols) : arraykd(rows*cols) {
         this->m_pmeta->dim = 2;
         this->m_pmeta->dimk[0] = rows;
         this->m_pmeta->dimk[1] = cols;
         this->copy_meta();
     }
-    array2d(const array& arr) : array(arr) {
+    array2d(const arraykd& arr) : arraykd(arr) {
         assert(this->dim() == 2);
     }
 
@@ -234,9 +234,9 @@ public:
     }
 };
 
-class array3d : public array {
+class array3d : public arraykd {
 public:
-    array3d(int rows, int cols, int channels) : array(rows * cols * channels) {
+    array3d(int rows, int cols, int channels) : arraykd(rows * cols * channels) {
         this->m_pmeta->dim = 3;
         this->m_pmeta->dimk[0] = rows;
         this->m_pmeta->dimk[1] = cols;
@@ -244,7 +244,7 @@ public:
         this->copy_meta();
     }
 
-    array3d(const array& arr) : array(arr) {
+    array3d(const arraykd& arr) : arraykd(arr) {
         assert(arr.dim() == 3);
     }
 
@@ -263,7 +263,7 @@ public:
 
 
 //b & c are vertical vectors
-inline void mul_addv(const array2d& a, const array&b, array& c){
+inline void mul_addv(const array2d& a, const arraykd&b, arraykd& c){
     assert(a.rows() == c.size());
     assert(a.cols() == b.size());
     int row = a.rows(), col = a.cols();
@@ -278,7 +278,7 @@ inline void mul_addv(const array2d& a, const array&b, array& c){
 }
 
 //a & c are horizontal vectors
-inline void mul_addh(const array& a, const array2d&b, array& c){
+inline void mul_addh(const arraykd& a, const array2d&b, arraykd& c){
     assert(a.size() == b.rows());
     assert(c.size() == b.cols());
     int row = b.rows(), col = b.cols();
@@ -292,7 +292,7 @@ inline void mul_addh(const array& a, const array2d&b, array& c){
     }
 }
 
-inline void mul_wise(const array& a, const array& b, array& c){
+inline void mul_wise(const arraykd& a, const arraykd& b, arraykd& c){
     assert(a.size() == b.size());
     assert(a.size() == c.size());
     const int size = a.size();
@@ -302,7 +302,7 @@ inline void mul_wise(const array& a, const array& b, array& c){
     }
 }
 
-inline void mul_wise_add(const array& a, const array& b, array& c){
+inline void mul_wise_add(const arraykd& a, const arraykd& b, arraykd& c){
     assert(a.size() == b.size());
     assert(a.size() == c.size());
     const int size = a.size();
@@ -312,7 +312,7 @@ inline void mul_wise_add(const array& a, const array& b, array& c){
     }
 }
 
-inline void mul(const array& src, float factor, array& dst){
+inline void mul(const arraykd& src, float factor, arraykd& dst){
     assert(src.size() == dst.size());
     const int size = src.size();
     OMP_FOR
@@ -321,7 +321,7 @@ inline void mul(const array& src, float factor, array& dst){
     }
 }
 
-inline void mul(const array& src, float factor, float bias, array& dst) {
+inline void mul(const arraykd& src, float factor, float bias, arraykd& dst) {
     assert(src.size() == dst.size());
     const int size = src.size();
     OMP_FOR
@@ -330,7 +330,7 @@ inline void mul(const array& src, float factor, float bias, array& dst) {
     }
 }
 
-inline void mul_add(const array& src, float factor, array& dst){
+inline void mul_add(const arraykd& src, float factor, arraykd& dst){
     assert(src.size() == dst.size());
     const int size = src.size();
     OMP_FOR
@@ -340,7 +340,7 @@ inline void mul_add(const array& src, float factor, array& dst){
 }
 
 
-inline void add_to(const array& src, array& dst){
+inline void add_to(const arraykd& src, arraykd& dst){
     assert(src.size() == dst.size());
     const int sz = src.size();
     OMP_FOR
@@ -359,8 +359,8 @@ public:
     block(){};
 
     void resize(int size) {
-        m_signal = array(size);
-        m_error = array(size);
+        m_signal = arraykd(size);
+        m_error = arraykd(size);
     }
 
     void resize(int rows, int cols) {
@@ -374,8 +374,8 @@ public:
     }
 
     void resize(const std::vector<int> &dims){
-        m_signal = array(dims);
-        m_error = array(dims);
+        m_signal = arraykd(dims);
+        m_error = arraykd(dims);
     }
 
     void clear(float v = 0) {
@@ -385,15 +385,15 @@ public:
 
     // never set the m_signal & m_error variable directly,
     // unless make sure src&dst have the same dims
-    array& signal(){ return m_signal; }
-    array& error(){ return m_error; }
+    arraykd& signal(){ return m_signal; }
+    arraykd& error(){ return m_error; }
 
-    inline void set_signal(array& src) {
+    inline void set_signal(arraykd& src) {
         CHECK(cmp_vec(src.dims(), m_signal.dims()));
         this->m_signal = src;
     }
 
-    array& new_signal() {
+    arraykd& new_signal() {
         m_signal = m_signal.clone(false);
         return m_signal;
     }
@@ -411,8 +411,8 @@ public:
     }
 
 private:
-    array m_signal;
-    array m_error;
+    arraykd m_signal;
+    arraykd m_error;
 };
 
 typedef std::shared_ptr<block> block_ptr;
@@ -438,7 +438,7 @@ private:
 
 
 
-inline bool cmp_array_dim(const array& a, const array& b){
+inline bool cmp_array_dim(const arraykd& a, const arraykd& b){
     if (a.dim() != b.dim()) return false;
     return cmp_vec(a.dims(), b.dims());
 }

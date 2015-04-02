@@ -27,7 +27,7 @@ bool softmax_loss_layer::begin_seq() {
 bool softmax_loss_layer::forward(int t){
     auto& input = m_input_block->signal();
     array2d label = m_label_block->signal();
-    array &output = m_input_block->signal().clone();
+    arraykd &output = m_input_block->signal().clone();
     m_output_history.push_back(output);
 
     softmax_normalize(input, output);

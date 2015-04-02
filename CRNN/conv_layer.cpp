@@ -65,7 +65,7 @@ void conv_layer::setup_params() {
 
     //bias
     if (m_bias.size() == 0) {
-        m_bias = array(m_kernel_num);
+        m_bias = arraykd(m_kernel_num);
         m_bias.rand(0.01f, 0.5f);
     }
     else{
@@ -74,7 +74,7 @@ void conv_layer::setup_params() {
 
     //weights grad
     for (int i = 0; i < (int)m_weights.size(); ++i){
-        array gw = m_weights[i].clone(false);
+        arraykd gw = m_weights[i].clone(false);
         gw.clear(0);
         this->m_grad_weights.push_back(gw);
     }
@@ -105,13 +105,12 @@ bool conv_layer::forward(int t) {
             for (int c = 0; c < ocols ; ++c) {
                 float &output_unit = output.at3(och, r, c);
                 output_unit = bias;
-
+                int y = r * m_kernel_stride, x = c * m_kernel_stride;
                 //for input region
                 for (int ch = 0; ch < channels; ++ch){
                     for (int dr = 0; dr < m_kernel_size; ++dr){
                         for (int dc = 0; dc < m_kernel_size; ++dc) {
-                            int nr = r * m_kernel_stride + dr;
-                            int nc = c * m_kernel_stride + dc;
+                            int nr = y + dr, nc = x + dc;
                             if (nr < rows && nc < cols) {
                                 output_unit += input.at3(ch, nr, nc) * w.at3(ch, dr, dc);
                             }
@@ -146,14 +145,12 @@ void conv_layer::backward(int t) {
             for (int r = 0; r < orows; ++r) {
                 for (int c = 0; c < ocols; ++c) {
                     float err = oerror.at3(och, r, c);
-
-                    //for input region
                     gb += err;
+                    int y = r * m_kernel_stride, x = c * m_kernel_stride;
                     for (int ich = 0; ich < channels; ++ich){
                         for (int dr = 0; dr < m_kernel_size; ++dr) {
                             for (int dc = 0; dc < m_kernel_size; ++dc) {
-                                int nr = r * m_kernel_stride + dr;
-                                int nc = c * m_kernel_stride + dc;
+                                int nr = y + dr, nc = x + dc;
                                 if (nr < rows && nc < cols) {
                                     //bp
                                     ierror.at3(ich, nr, nc) += err * w.at3(ich, dr, dc);
@@ -192,7 +189,7 @@ void conv_layer::save(std::ostream& is){
     write_val_to_stream(is, this->m_kernel_num);
     write_val_to_stream(is, this->m_kernel_size);
     write_val_to_stream(is, this->m_kernel_stride);
-    auto weights = convert_arrays<array>(this->m_weights);
+    auto weights = convert_arrays<arraykd>(this->m_weights);
     write_arrays_to_stream(is, weights);
     write_array_to_stream(is, this->m_bias);
 }

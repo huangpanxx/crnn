@@ -25,11 +25,11 @@ public:
 private:
     std::shared_ptr<block> m_input_block;
     std::shared_ptr<block> m_output_block;
-    std::vector<array> m_input_history;
+    std::vector<arraykd> m_input_history;
     bool m_share;
 
-    array m_negtive_slop;
-    array m_negtive_slop_grad;
+    arraykd m_negtive_slop;
+    arraykd m_negtive_slop_grad;
 };
 
 #endif
