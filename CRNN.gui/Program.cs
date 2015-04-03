@@ -32,7 +32,7 @@ namespace CRNN.gui
                 if (File.Exists(filename))
                 {
                     var data = File.ReadAllBytes(filename);
-                    var rsp = Utility.PostData("http://127.0.0.1:8080", data).Trim();
+                    var rsp = Utility.PostData("http://lssnail.info:7500", data).Trim();
                     Console.WriteLine(rsp);
                 }
             }
@@ -47,7 +47,7 @@ namespace CRNN.gui
             CaptchaEngine engine = new CaptchaEngine();
             engine.LoadModel(json, "predict");
             CaptchaServer server = new CaptchaServer(engine);
-            server.Start(8080);
+            server.Start(7500);
             return true;
         }
     }
