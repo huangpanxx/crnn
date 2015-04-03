@@ -61,8 +61,8 @@ float* alloc_array(long size) {
 
     if (it == map.end() || it->second.size() == 0){
         //no freed block
-        const int times = 4 * 1024 * 1024 / size;
-        auto pt = new float[size*times]; //allocate 4m memory
+        const long times = std::max(1L, 4 * 1024 * 1024 / size);
+        auto pt = new float[size*times]; //allocate 4M memory
         CHECK(pt != NULL);
 
         //recored pointers

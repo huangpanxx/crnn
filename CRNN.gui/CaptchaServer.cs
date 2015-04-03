@@ -25,6 +25,7 @@ namespace CRNN.gui
         {
             _listener.Prefixes.Add(String.Format("http://*:{0}/", port));
             _listener.Start();
+            Console.WriteLine("Serve on port {0}.", port);
             while (true)
             {
                 //single thread

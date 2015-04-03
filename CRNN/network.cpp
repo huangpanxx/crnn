@@ -12,7 +12,7 @@ network::network(const std::string& config, const std::string& plan) {
 
     //learn rate
     CHECK(m_config.contains("learn_rate"));
-    m_learn_rate = (float)m_config.get("learn_rate").get<double>();
+    m_learn_rate = (float) m_config.get("learn_rate").get<double>();
     CHECK(m_learn_rate >= 0);
 
     //input dims
@@ -37,8 +37,8 @@ network::network(const std::string& config, const std::string& plan) {
     //predict
     if (plan_config.contains("input")) {
         CHECK(plan_config.contains("output"));
-        m_input_block_id =  plan_config.get("input").get<string>();
-        m_output_block_id =  plan_config.get("output").get<string>();
+        m_input_block_id = plan_config.get("input").get<string>();
+        m_output_block_id = plan_config.get("output").get<string>();
         auto input_block = m_block_factory.get_block(m_input_block_id);
         input_block->resize(m_input_dims);
     }
@@ -92,7 +92,6 @@ network::network(const std::string& config, const std::string& plan) {
         load_layers(is, m_layer_cache);
         is.close();
     }
-
 
     //setup block
     for_each(setup_block_seq.begin(), setup_block_seq.end(),
