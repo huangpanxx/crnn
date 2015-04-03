@@ -90,16 +90,17 @@ network::network(const std::string& config, const std::string& plan) {
     ifstream is(m_model_file, ios::binary | ios::in);
     if (is) {
         load_layers(is, m_layer_cache);
+        is.close();
     }
-    is.close();
+
 
     //setup block
     for_each(setup_block_seq.begin(), setup_block_seq.end(),
-        [](layer_ptr x){x->setup_block(); });
+        [](layer_ptr &x){ x->setup_block(); });
 
     //setup params
     for_each(setup_params_seq.begin(), setup_params_seq.end(),
-        [](layer_ptr x){x->setup_params(); });
+        [](layer_ptr &x){ x->setup_params(); });
 
     //stop loss
     if (plan_config.contains("stop_loss")) {
@@ -108,6 +109,7 @@ network::network(const std::string& config, const std::string& plan) {
     else{
         m_stop_loss = 0.0f;
     }
+
 
     //save epoch
     this->m_save_epoch = (int) m_config.get("save_epoch").get<double>();

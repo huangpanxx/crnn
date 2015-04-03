@@ -61,8 +61,8 @@ float* alloc_array(long size) {
 
     if (it == map.end() || it->second.size() == 0){
         //no freed block
-        const int times = 50;
-        auto pt = new float[size*times]; //allocate 50 times memory
+        const int times = 4 * 1024 * 1024 / size;
+        auto pt = new float[size*times]; //allocate 4m memory
 
         //recored pointers
         auto& am = get_allocated_mem();
