@@ -20,21 +20,16 @@ namespace CRNN.gui
 
         static void MyMain(string[] args)
         {
-            Utility.Run(args, RunServer, RunClient);
+            Utility.Run(args, RunServer, TestAndTrain);
         }
 
-        static bool RunClient(string[] args)
+        static bool TestAndTrain(string[] args)
         {
             if (args.Length != 1) return false;
             while (true)
             {
-                var filename = Utility.PromoteLine("IMAGE");
-                if (File.Exists(filename))
-                {
-                    var data = File.ReadAllBytes(filename);
-                    var rsp = Utility.PostData("http://lssnail.info:7500", data).Trim();
-                    Console.WriteLine(rsp);
-                }
+                var filename = Utility.PromoteLine("MODEL");
+                Network.TrainAndTestNetwork(filename);
             }
         }
 
