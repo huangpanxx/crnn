@@ -6,7 +6,7 @@
 using namespace std;
 
 //global mutex
-inline mutex& get_mem_mutex() {
+mutex& get_mem_mutex() {
     static mutex mem_mutex;
     return mem_mutex;
 }

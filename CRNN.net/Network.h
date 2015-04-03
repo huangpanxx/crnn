@@ -11,10 +11,10 @@ namespace CRNNnet {
         Network(System::String^ json, System::String^ plan);
         ~Network();
 
-        void set_input(const FloatArray^ data);
-        FloatArray^ forward();
-        System::String^ translate(int k);
-        array<int>^ input_dims();
+        void SetInput(FloatArray^ data);
+        FloatArray^ Forward();
+        System::String^ Translate(int k);
+        array<int>^ InputDims();
 
     private:
         network *m_pnetwork;

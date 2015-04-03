@@ -20,19 +20,19 @@ namespace CRNNnet {
         float At3(int ch, int r, int c){
             return ((array3d*)this->m_array)->at3(ch, r, c);
         }
-        int rows(){
+        int Rows(){
             return m_array->dim(0);
         }
-        int cols(){
+        int Cols(){
             return m_array->dim(1);
         }
-        int channels(){
+        int Channels(){
             return  m_array->dim(2);
         }
-        int size(){
+        int Size(){
             return m_array->size();
         }
-        int arg_max(){
+        int ArgMax(){
             return this->m_array->arg_max();
         }
     private:

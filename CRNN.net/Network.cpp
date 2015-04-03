@@ -17,20 +17,22 @@ Network::Network(String^ json, String^ plan){
     this->m_pnetwork = new network(sjson, splan);
 }
 
-void Network::set_input(const FloatArray^ data){
+void Network::SetInput(FloatArray^ data){
+    auto &arr = *data->Array();
+    this->m_pnetwork->set_input(arr);
 }
 
-FloatArray^ Network::forward(){
+FloatArray^ Network::Forward(){
     arraykd arr = this->m_pnetwork->forward();
     return gcnew FloatArray(arr);
 }
 
-String^ Network::translate(int k){
+String^ Network::Translate(int k){
     auto ans = this->m_pnetwork->translate(k);
     return gcnew String(ans.c_str());
 }
 
-array<int>^ Network::input_dims() {
+array<int>^ Network::InputDims() {
     auto dims = this->m_pnetwork->input_dims();
     auto arr = gcnew array<int>((int)dims.size());
     for (int i = 0; i < (int) dims.size(); ++i){
