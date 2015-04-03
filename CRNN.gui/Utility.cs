@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using CRNNnet;
 using System.Drawing;
+using System.IO;
+using System.Net;
 
 namespace CRNN.gui
 {
@@ -28,6 +30,36 @@ namespace CRNN.gui
                     }
                 }
                 return new FloatArray(new int[] { row, col, 3 }, data);
+            }
+        }
+        public static String PromoteLine(String msg)
+        {
+            Console.Write(msg + ":");
+            return Console.ReadLine();
+        }
+
+        public static void Run(string[] args, params Func<string[], bool>[] fns)
+        {
+            foreach (var fn in fns)
+            {
+                if (fn(args))
+                {
+                    break;
+                }
+            }
+        }
+
+        public static String PostData(String url, byte[] data)
+        {
+            HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(url);
+            req.Method = "POST";
+            using (var stream = req.GetRequestStream())
+            {
+                stream.Write(data, 0, data.Length);
+            }
+            using (var reader = new StreamReader(req.GetResponse().GetResponseStream()))
+            {
+                return reader.ReadToEnd();
             }
         }
     }

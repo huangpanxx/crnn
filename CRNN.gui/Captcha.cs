@@ -46,8 +46,8 @@ namespace CRNN.gui
             float conf = Confidence;
             const String TEMPLATE = "{\"code\":{{CODE}},\"time\":{{TIME}},\"confidence\":{{CONFIDENCE}}}";
             return TEMPLATE.Replace("{{CODE}}", code)
-                .Replace("{{TIME}}", Time.ToString())
-                .Replace("{{CONFIDENCE}}", conf.ToString());
+                .Replace("{{TIME}}", Time.ToString("F3"))
+                .Replace("{{CONFIDENCE}}", conf.ToString("F3"));
         }
     }
 }

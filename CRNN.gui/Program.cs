@@ -20,13 +20,35 @@ namespace CRNN.gui
 
         static void MyMain(string[] args)
         {
-            Console.Write("MODEL:");
-            var filename = Console.ReadLine();
+            Utility.Run(args, RunServer, RunClient);
+        }
+
+        static bool RunClient(string[] args)
+        {
+            if (args.Length != 1) return false;
+            while (true)
+            {
+                var filename = Utility.PromoteLine("IMAGE");
+                if (File.Exists(filename))
+                {
+                    var data = File.ReadAllBytes(filename);
+                    var rsp = Utility.PostData("http://127.0.0.1:8080", data).Trim();
+                    Console.WriteLine(rsp);
+                }
+            }
+        }
+
+        static bool RunServer(string[] args)
+        {
+            if (args.Length != 2 || !args[1].EndsWith(".json"))
+                return false;
+            var filename = args[1];
             var json = File.ReadAllText(filename);
             CaptchaEngine engine = new CaptchaEngine();
             engine.LoadModel(json, "predict");
             CaptchaServer server = new CaptchaServer(engine);
             server.Start(8080);
+            return true;
         }
     }
 }

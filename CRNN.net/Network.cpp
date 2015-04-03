@@ -1,6 +1,7 @@
 #include "Network.h"
 #include "../CRNN/test.h"
 #include "CRNNHelper.h"
+#include "../CRNN/utility.h"
 using namespace CRNNnet;
 using namespace std;
 using namespace System;
@@ -18,7 +19,23 @@ Network::Network(String^ json, String^ plan){
 }
 
 void Network::SetInput(FloatArray^ data){
-    auto &arr = *data->Array();
+    auto arr = *data->Array();
+    auto input_dims = this->m_pnetwork->input_dims();
+    auto data_dims = arr.dims();
+    if (!cmp_vec(data_dims, input_dims)) {
+        //dim not macth
+        if (data_dims.size() == 3 && input_dims.size() == 3 && data_dims[2] == input_dims[2] && input_dims[2] == 3) {
+            //if it is a image, resize it
+            array3d src = arr;
+            const int rows = input_dims[0], cols = input_dims[1];
+            arr = resize(src, cols, rows);
+        }
+        else{
+            //error
+            cout << "input data's dims do not match!" << endl;
+            CHECK(false);
+        }
+    }
     this->m_pnetwork->set_input(arr);
 }
 
