@@ -20,7 +20,7 @@ void sigmoid_layer::setup_block() {
 }
 
 
-bool sigmoid_layer::forward(int t) {
+bool sigmoid_layer::forward() {
     auto& output = this->m_output_block->new_signal();
     auto& input = this->m_input_block->signal();
 
@@ -33,7 +33,7 @@ bool sigmoid_layer::forward(int t) {
     return true;
 }
 
-void sigmoid_layer::backward(int t) {
+void sigmoid_layer::backward() {
     auto& ierror = this->m_input_block->error();
     auto& oerror = this->m_output_block->error();
     auto& output = this->m_output_history.back();

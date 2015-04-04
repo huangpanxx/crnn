@@ -67,20 +67,13 @@ void train(const vector<shared_ptr<layer> > &layer_seq,
         }
 
         //forward
-        vector<pair<shared_ptr<layer>, int> > acti_history;
-        bool ok = true;
-        for (int t = 0; ok; ++t) {
-            for (int i = 0; i < (int) layer_seq.size() && ok; ++i) {
-                auto &layer = layer_seq[i];
-                ok = layer->forward(t);
-                acti_history.push_back(make_pair(layer, t));
-            }
+        for (auto &layer : layer_seq) {
+            layer->forward();
         }
 
         //backward
-        for (int i = 0; i < (int) acti_history.size(); ++i){
-            auto &pair = acti_history[acti_history.size() - 1 - i];
-            pair.first->backward(pair.second);
+        for (auto it = layer_seq.rbegin(); it != layer_seq.rend(); ++it){
+            (*it)->backward();
         }
 
         //sgd(every batch times)

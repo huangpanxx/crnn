@@ -21,10 +21,11 @@ void softmax_loss_layer::setup_block() {
 
 bool softmax_loss_layer::begin_seq() {
     this->m_output_history.clear();
+    m_t = 0;
     return true;
 }
 
-bool softmax_loss_layer::forward(int t){
+bool softmax_loss_layer::forward(){
     auto& input = m_input_block->signal();
     array2d label = m_label_block->signal();
     arraykd &output = m_input_block->signal().clone();
@@ -35,7 +36,7 @@ bool softmax_loss_layer::forward(int t){
     //compute loss
     OMP_FOR
     for (int i = 0; i < output.size(); ++i) {
-        float lb = label.at2(t, i);
+        float lb = label.at2(m_t, i);
         if (fabs(lb) > 1e-5) {
             m_loss_sum -= lb * log(1e-15f + output.at(i));
         }
@@ -48,24 +49,26 @@ bool softmax_loss_layer::forward(int t){
             cout << i
                 << "\t" << input.at(i)
                 << "\t" << output.at(i)
-                << "\t" << label.at2(t, i) << endl;
+                << "\t" << label.at2(m_t, i) << endl;
         }
         cout << "==============" << endl << endl;
     }
 
     //stop
-    return (t + 1) < label.rows();
+    ++m_t;
+    return m_t < label.rows();
 }
 
-void softmax_loss_layer::backward(int t) {
+void softmax_loss_layer::backward() {
     auto& error = m_input_block->error();
     auto& output = m_output_history.back();
     array2d label = m_label_block->signal();
     m_output_history.pop_back();
 
+    --m_t;
     OMP_FOR
     for (int i = 0; i < error.size(); ++i) {
-        error.at(i) += label.at2(t, i) - output.at(i);
+        error.at(i) += label.at2(m_t, i) - output.at(i);
     }
 }
 

@@ -145,9 +145,9 @@ string read_file(const string& file_name) {
 }
 
 
-std::map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
+std::unordered_map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
     const std::vector<std::shared_ptr<layer> > &layers){
-    map<string, shared_ptr<layer> > layer_map;
+    unordered_map<string, shared_ptr<layer> > layer_map;
     for (auto &layer : layers){
         CHECK(layer_map.count(layer->name()) == 0);
         layer_map[layer->name()] = layer;
@@ -156,7 +156,7 @@ std::map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
 }
 
 void save_layers(std::ostream& os,
-    const std::map<std::string, std::shared_ptr<layer> >& layers){
+    const std::unordered_map<std::string, std::shared_ptr<layer> >& layers){
     for (auto &pair : layers) {
         int head_pos = (int) os.tellp();
         write_val_to_stream<int>(os, 0);
@@ -172,7 +172,7 @@ void save_layers(std::ostream& os,
 }
 
 void load_layers(std::istream& is,
-    const std::map<std::string, std::shared_ptr<layer> >& layers){
+    const std::unordered_map<std::string, std::shared_ptr<layer> >& layers){
     while (is) {
         int tail_pos = read_val_from_stream<int>(is);
         if (!is) break;

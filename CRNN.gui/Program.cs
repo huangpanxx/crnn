@@ -25,19 +25,17 @@ namespace CRNN.gui
 
         static bool TestAndTrain(string[] args)
         {
-            if (args.Length != 1) return false;
-            while (true)
-            {
-                var filename = Utility.PromoteLine("MODEL");
-                Network.TrainAndTestNetwork(filename);
-            }
+            if (args.Length != 2 || !args[1].EndsWith(".json"))
+                return false;
+            var filename = args[1];
+            Network.TrainAndTestNetwork(filename);
+            return true;
         }
 
         static bool RunServer(string[] args)
         {
-            if (args.Length != 2 || !args[1].EndsWith(".json"))
-                return false;
-            var filename = args[1];
+            if (args.Length != 1) return false;
+            var filename = Utility.PromoteLine("MODEL");
             var json = File.ReadAllText(filename);
             CaptchaEngine engine = new CaptchaEngine();
             engine.LoadModel(json, "predict");

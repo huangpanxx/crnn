@@ -433,7 +433,7 @@ public:
     }
 
 private:
-    std::map<std::string, block_ptr> m_cache;
+    std::unordered_map<std::string, block_ptr> m_cache;
 };
 
 

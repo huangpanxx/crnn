@@ -36,23 +36,22 @@ private:
     std::vector<layer_ptr> get_layers(const picojson::value& val);
     std::vector<layer_ptr> get_layers(const std::vector<std::string> &names);
     void config_layer(picojson::value& val, const std::string& layer_name, layer_ptr& layer);
-    std::map<int, std::string> m_label_dict;
+    std::unordered_map<int, std::string> m_label_dict;
 
 private:
     block_factory m_block_factory;
     std::vector<std::vector<layer_ptr> > m_activate_layer_seq;
     std::vector<layer_ptr> m_beg_layer_seq;
-    std::map<std::string, layer_ptr> m_layer_cache;
+    std::unordered_map<std::string, layer_ptr> m_layer_cache;
     data_layer* m_data_layer;
     loss_layer* m_loss_layer;
     std::string m_model_file;
     picojson::value m_config;
     std::vector<int> m_input_dims;
     int m_save_epoch;
-    int m_t;
     float m_stop_loss;
     float m_learn_rate;
-
+    int m_t;
     std::string m_output_block_id;
     std::string m_input_block_id;
 };

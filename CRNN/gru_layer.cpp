@@ -111,16 +111,16 @@ bool gru_layer::begin_seq(){
     return true;
 }
 
-bool gru_layer::forward(int t) {
+bool gru_layer::forward() {
     for (auto& layer : m_layers){
-        layer->forward(t);
+        layer->forward();
     }
     return true;
 }
 
-void gru_layer::backward(int t) {
+void gru_layer::backward() {
     for (auto it = m_layers.rbegin(); it != m_layers.rend(); ++it){
-        (*it)->backward(t);
+        (*it)->backward();
     }
 
 }

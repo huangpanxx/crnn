@@ -10,9 +10,9 @@ public:
         block_ptr &output_block);
 
     virtual void setup_block();
-    virtual bool forward(int t);
-    virtual void backward(int t);
-    virtual void end_batch(int t);
+    virtual bool forward();
+    virtual void backward();
+    virtual void end_batch(int size);
 
 private:
     std::vector<block_ptr> m_input_blocks;

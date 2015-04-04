@@ -56,11 +56,7 @@ void array_layer::setup_block() {
     }
 }
 
-bool array_layer::forward(int t) {
-    //write data & label
-    if (t != 0) {
-        return false;
-    }
+bool array_layer::forward() {
     int group = m_iter*m_batch;
     int k = m_index / group;
     int idx = (k * m_batch + (m_index % group) % m_batch) % (int) m_samples.size();

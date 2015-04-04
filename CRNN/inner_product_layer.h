@@ -19,8 +19,8 @@ public:
     virtual void setup_params();
 
     virtual bool begin_seq();
-    virtual bool forward(int t);
-    virtual void backward(int t);
+    virtual bool forward();
+    virtual void backward();
     virtual void end_batch(int size);
 
     virtual void save(std::ostream& os);

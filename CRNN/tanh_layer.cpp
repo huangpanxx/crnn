@@ -20,7 +20,7 @@ bool tanh_layer::begin_seq(){
     return true; 
 }
 
-bool tanh_layer::forward(int t){
+bool tanh_layer::forward(){
     auto& input = this->m_input_block->signal();
     auto& output = this->m_output_block->new_signal();
     auto mid = input.clone(false);
@@ -43,7 +43,7 @@ bool tanh_layer::forward(int t){
     return true;
 };
 
-void tanh_layer::backward(int t){
+void tanh_layer::backward(){
     auto& mid = this->m_mid_history.back();
     auto& ierr = this->m_input_block->error();
     auto& oerr = this->m_output_block->error();

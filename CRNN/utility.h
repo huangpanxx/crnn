@@ -47,14 +47,14 @@ void write_arrays_to_stream(std::ostream& os, const std::vector<arraykd>& arrs);
 
 std::vector<arraykd> read_arrays_from_stream(std::istream& is);
 
-std::map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
+std::unordered_map<std::string, std::shared_ptr<layer> >  build_name_layer_map(
     const std::vector<std::shared_ptr<layer> > &layers);
 
 void save_layers(std::ostream& os,
-    const std::map<std::string, std::shared_ptr<layer> >& layers);
+    const std::unordered_map<std::string, std::shared_ptr<layer> >& layers);
 
 void load_layers(std::istream& is,
-    const std::map<std::string, std::shared_ptr<layer> >& layers);
+    const std::unordered_map<std::string, std::shared_ptr<layer> >& layers);
 
 std::string read_file(const std::string& file_name);
 

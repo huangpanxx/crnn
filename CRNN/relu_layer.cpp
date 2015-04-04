@@ -34,7 +34,7 @@ void relu_layer::setup_params() {
 }
 
 
-bool relu_layer::forward(int t) {
+bool relu_layer::forward() {
     auto& output = this->m_output_block->new_signal();
     auto& input = this->m_input_block->signal();
     int size = input.size();
@@ -54,7 +54,7 @@ bool relu_layer::forward(int t) {
     return true;
 }
 
-void relu_layer::backward(int t) {
+void relu_layer::backward() {
     auto& ierror = this->m_input_block->error();
     auto& oerror = this->m_output_block->error();
     auto& input = this->m_input_history.back();

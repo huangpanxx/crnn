@@ -19,7 +19,7 @@ bool scale_layer::begin_seq() {
     return true;
 }
 
-bool scale_layer::forward(int t) {
+bool scale_layer::forward() {
     auto& output = this->m_output_block->new_signal();
     auto& input = this->m_input_block->signal();
     if (m_bias != 0){
@@ -31,7 +31,7 @@ bool scale_layer::forward(int t) {
     return true;
 }
 
-void scale_layer::backward(int t) {
+void scale_layer::backward() {
     auto& oerr = this->m_output_block->error();
     auto& ierr = this->m_input_block->error();
     mul_add(oerr, m_scale, ierr);

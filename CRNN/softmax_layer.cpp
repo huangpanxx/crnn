@@ -16,14 +16,14 @@ void softmax_layer::setup_block() {
     CHECK(cmp_vec(this->m_output_block->dims(), this->m_input_block->dims()));
 }
 
-bool softmax_layer::forward(int t) {
+bool softmax_layer::forward() {
     auto& input = this->m_input_block->signal();
     auto& output = this->m_output_block->new_signal();
     softmax_normalize(input, output);
     return true;
 }
 
-void softmax_layer::backward(int t) {
+void softmax_layer::backward() {
     //NOT IMPLEMENT
     CHECK(0);
 }

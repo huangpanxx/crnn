@@ -29,7 +29,7 @@ public:
     virtual void setup_block();
 
     virtual bool begin_seq();
-    virtual bool forward(int t);
+    virtual bool forward();
 
     virtual int batch() { return m_batch; }
     int iter() { return m_iter; }

@@ -11,8 +11,8 @@ public:
     virtual void setup_block(){};
     virtual void setup_params(){};
     virtual bool begin_seq(){ return true; }
-    virtual bool forward(int t){ return true; };
-    virtual void backward(int t){};
+    virtual bool forward(){ return true; };
+    virtual void backward(){};
     virtual void end_batch(int size){};
 
     float learn_rate(){ return m_learn_rate; }

@@ -13,8 +13,8 @@ public:
     virtual void setup_block();
     virtual void setup_params();
 
-    virtual bool forward(int t);
-    virtual void backward(int t);
+    virtual bool forward();
+    virtual void backward();
     virtual bool begin_seq();
 
     virtual void save(std::ostream& os);

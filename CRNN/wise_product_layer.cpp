@@ -20,7 +20,7 @@ bool wise_product_layer::begin_seq() {
     return true;
 }
 
-bool wise_product_layer::forward(int t){
+bool wise_product_layer::forward(){
     auto& input1 = this->m_input_block1->signal();
     auto& input2 = this->m_input_block2->signal();
     auto& output = this->m_output_block->new_signal();
@@ -29,7 +29,7 @@ bool wise_product_layer::forward(int t){
     return true;
 }
 
-void wise_product_layer::backward(int t){
+void wise_product_layer::backward(){
     auto& pair = this->m_input_history.back();
 
     auto& input1 = pair.first;

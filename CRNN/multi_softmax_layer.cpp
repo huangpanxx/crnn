@@ -26,7 +26,7 @@ void multi_softmax_layer::setup_block(){
     CHECK(this->m_output_block->dims()[1] == cols);
 }
 
-bool multi_softmax_layer::forward(int t) {
+bool multi_softmax_layer::forward() {
     array2d output = this->m_output_block->new_signal();
 
     OMP_FOR
@@ -37,7 +37,7 @@ bool multi_softmax_layer::forward(int t) {
     return true;
 }
 
-void multi_softmax_layer::backward(int t) {
+void multi_softmax_layer::backward() {
     //NOT IMPLEMENT
     CHECK(0);
 }

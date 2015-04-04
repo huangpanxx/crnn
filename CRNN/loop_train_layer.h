@@ -10,14 +10,12 @@ public:
     void setup_block();
     void setup_params();
     bool begin_seq();
-    bool forward(int t);
-    void backward(int t);
+    bool forward();
+    void backward();
     void end_batch(int size);
 
 private:
-    int m_t;
     std::vector<layer_ptr> m_layers;
-    std::vector<std::pair<layer_ptr,int> > m_history;
 };
 
 #endif

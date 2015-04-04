@@ -6,7 +6,6 @@
 #include "picojson.h"
 #include "layer.h"
 #include "array_layer.h"
-#include "solver.h"
 #include "inner_product_layer.h"
 #include "softmax_loss_layer.h"
 #include "sigmoid_layer.h"

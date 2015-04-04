@@ -12,6 +12,7 @@
 #include <functional>
 #include <map>
 #include <ctime>
+#include <unordered_map>
 
 #ifndef _DEBUG
 
@@ -32,7 +33,7 @@ inline void print_check(const char* msg, const char* filename, int line) {
         << "\"" << filename << "\", line " << line 
         << ": CHECK \"" << msg << "\" failed!" << std::endl;
     system("pause");
-    exit(0);
+    exit(-1);
 }
 
 #define CHECK(_Expression) \

@@ -31,7 +31,7 @@ bool multi_softmax_loss_layer::begin_seq() {
 }
 
 
-bool multi_softmax_loss_layer::forward(int t) {
+bool multi_softmax_loss_layer::forward() {
     vector<arraykd> outputs;
     for (auto& block : m_input_blocks){
         auto& input = block->signal();
@@ -60,7 +60,7 @@ bool multi_softmax_loss_layer::forward(int t) {
     return true;
 }
 
-void multi_softmax_loss_layer::backward(int t){
+void multi_softmax_loss_layer::backward(){
     array2d label = m_label_block->signal();
     const int label_num = (int) m_input_blocks.size();
     const int label_size = label.cols();
@@ -85,7 +85,7 @@ float multi_softmax_loss_layer::loss() {
     return floss;
 }
 
-void multi_softmax_loss_layer::end_batch(int t){
+void multi_softmax_loss_layer::end_batch(int size){
     this->m_loss_num = 0;
     this->m_loss_sum = 0;
 }

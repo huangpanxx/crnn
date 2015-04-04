@@ -9,8 +9,8 @@ public:
         std::shared_ptr<block> input_block,
         std::shared_ptr<block> output_block);
     virtual void setup_block();
-    virtual bool forward(int t);
-    virtual void backward(int t);
+    virtual bool forward();
+    virtual void backward();
     virtual bool begin_seq();
 
 private:

@@ -64,13 +64,12 @@ network::network(const std::string& config, const std::string& plan) {
 
     if (plan_config.contains("activation")) {
         auto arr = plan_config.get("activation").get<picojson::array>();
-        for (auto seq : arr) {
-            auto layers = get_layers(seq);
-            m_activate_layer_seq.push_back(layers);
+        for (auto &cfg : arr){
+            m_activate_layer_seq.push_back(get_layers(cfg));
         }
     }
-    else {
-        m_activate_layer_seq.push_back(setup_block_seq);
+    else{
+        this->m_activate_layer_seq.push_back(setup_block_seq);
     }
 
     //train(loss data)
@@ -119,12 +118,19 @@ network::network(const std::string& config, const std::string& plan) {
 
 vector<layer_ptr> network::get_layers(const picojson::value& val){
     auto arr = val.get<picojson::array>();
-    vector<string> names;
+    vector<layer_ptr> layers;
     for (auto val : arr){
-        auto name = val.get<string>();
-        names.push_back(name);
+        if (val.is<string>()){
+            auto layer = get_layer(val.get<string>());
+            layers.push_back(layer);
+        }
+        if (val.is<picojson::array>()) {
+            auto sub_layers = get_layers(val);
+            layer_ptr loop_layer(new loop_train_layer(sub_layers));
+            layers.push_back(loop_layer);
+        }
     }
-    return get_layers(names);
+    return layers;
 }
 
 layer_ptr network::get_layer(const std::string &name) {
@@ -233,77 +239,57 @@ void network::train() {
         //begin
         for (auto &layer : this->m_beg_layer_seq) {
             if (!layer->begin_seq()) {
-                goto finish;
+                goto finish_train;
             }
         }
 
-        //activation seq
-        vector<pair<int, layer_ptr> > acti_history;
+        vector<layer_ptr> forward_history;
 
         //forward
-        for (int t = 0;; ++t) {
-            vector<layer_ptr> layer_seq;
-            if (t < (int)this->m_activate_layer_seq.size()) {
-                layer_seq = this->m_activate_layer_seq[t];
-            }
-            else{
-                layer_seq = this->m_activate_layer_seq.back();
-            }
-            bool ok = true;
-            for (auto &layer : layer_seq) {
-                acti_history.push_back(make_pair(t, layer));
-                if (!layer->forward(t)) {
-                    ok = false;
-                    break;
+        for (auto &layers : this->m_activate_layer_seq){
+            for (auto& layer : layers){
+                forward_history.push_back(layer);
+                if (!layer->forward()){
+                    goto end_forward;
                 }
             }
-            if (!ok) break;
         }
+        end_forward:
 
         //backward
-        for_each(acti_history.rbegin(),
-            acti_history.rend(),
-            [](pair<int, layer_ptr> &pair){
-            auto t = pair.first;
-            auto layer = pair.second;
-            layer->backward(t);
+        for_each(forward_history.rbegin(), 
+            forward_history.rend(),
+            [](layer_ptr &layer) {
+                layer->backward();
         });
 
         //info
         printf("epoch %d, iter %d.\r", epoch, iter);
     }
-    finish:
+    finish_train:
     printf("train finished.\n");
 }
 
 void network::set_input(const arraykd& data){
     CHECK(m_input_block_id != "");
-    auto &input = this->m_block_factory.get_block(this->m_input_block_id);
-    input->signal().copy(data);
     this->m_t = 0;
+    auto &input = this->m_block_factory.get_block(this->m_input_block_id);
+    input->signal() = data; //we don't need input has the same size
 }
 
 arraykd network::forward(){
-    vector<layer_ptr> acti_seq;
-
-    //select acti seq
-    if (m_t < (int)m_activate_layer_seq.size()) {
-        acti_seq = m_activate_layer_seq[m_t];
-    }
-    else{
-        acti_seq = m_activate_layer_seq.back();
-    }
-
     //beg
-    if (m_t == 0){
+    if (m_t == 0) {
         for (auto &layer : m_beg_layer_seq){
             layer->begin_seq();
         }
     }
 
     //forward
+    int index = std::min((int)this->m_activate_layer_seq.size() - 1, m_t);
+    auto acti_seq = this->m_activate_layer_seq[index];
     for (auto &layer : acti_seq){
-        layer->forward(m_t);
+        layer->forward();
     }
 
     m_t += 1;

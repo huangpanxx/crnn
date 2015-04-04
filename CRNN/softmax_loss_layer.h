@@ -12,8 +12,8 @@ public:
 
     virtual void setup_block();
     virtual bool begin_seq();
-    virtual bool forward(int t);
-    virtual void backward(int t);
+    virtual bool forward();
+    virtual void backward();
 
     virtual void end_batch(int size);
 
@@ -35,6 +35,7 @@ private:
     std::vector<arraykd> m_output_history;
     float m_loss_sum;
     int m_loss_num;
+    int m_t;
     bool m_report;
 };
 

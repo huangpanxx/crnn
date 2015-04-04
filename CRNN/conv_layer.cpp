@@ -89,7 +89,7 @@ bool conv_layer::begin_seq() {
     return true; 
 }
 
-bool conv_layer::forward(int t) { 
+bool conv_layer::forward() { 
     array3d input = m_input_block->signal();
     array3d output = m_output_block->new_signal();
 
@@ -124,7 +124,7 @@ bool conv_layer::forward(int t) {
     return true; 
 };
 
-void conv_layer::backward(int t) {
+void conv_layer::backward() {
     array3d input = this->m_input_history.back();
     array3d oerror = this->m_output_block->error();
     array3d ierror = this->m_input_block->error();

@@ -74,7 +74,7 @@ void inner_product_layer::setup_params(){
     }
 }
 
-bool inner_product_layer::forward(int t) {
+bool inner_product_layer::forward() {
     //input signals
     std::vector<arraykd> inputs;
     for (auto &arr : m_input_blocks){
@@ -100,7 +100,7 @@ bool inner_product_layer::forward(int t) {
     return true;
 }
 
-void inner_product_layer::backward(int t) {
+void inner_product_layer::backward() {
     auto &inputs = m_inputs_history.back();
     auto &error = m_output_block->error();
 

@@ -16,7 +16,7 @@ void add_layer::setup_block(){
     m_output_block->resize(dims);
 }
 
-bool add_layer::forward(int t){
+bool add_layer::forward(){
     auto& output = this->m_output_block->new_signal();
     output.clear(0);
     for (int j = 0; j < (int)this->m_input_blocks.size(); ++j){
@@ -26,7 +26,7 @@ bool add_layer::forward(int t){
     return true;
 }
 
-void add_layer::backward(int t){
+void add_layer::backward(){
     auto& oerr = this->m_output_block->error();
     for (int i = 0; i < (int)this->m_input_blocks.size(); ++i){
         auto& ierr = m_input_blocks[i]->error();

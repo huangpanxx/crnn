@@ -34,7 +34,7 @@ void max_pooling_layer::setup_block() {
     CHECK(ods[2] == channels);
 }
 
-bool max_pooling_layer::forward(int t) {
+bool max_pooling_layer::forward() {
     array3d output = m_output_block->new_signal();
     array3d max_index = output.clone(false);
     array3d input = m_input_block->signal();
@@ -77,7 +77,7 @@ bool max_pooling_layer::forward(int t) {
     return true;
 }
 
-void max_pooling_layer::backward(int t) {
+void max_pooling_layer::backward() {
     array3d oerror = m_output_block->error();
     array3d ierror = m_input_block->error();
     array3d &max_index = this->m_max_history.back();

@@ -12,10 +12,10 @@ public:
     virtual void setup_block();
     virtual void setup_params();
     virtual bool begin_seq();
-    virtual bool forward(int t);
-    virtual void backward(int t);
+    virtual bool forward();
+    virtual void backward();
 
-    virtual void end_batch(int t);
+    virtual void end_batch(int size);
 
     virtual float loss();
 
