@@ -141,6 +141,7 @@
     <ClInclude Include="image_data_layer.h" />
     <ClInclude Include="inner_product_layer.h" />
     <ClInclude Include="layer.h" />
+    <ClInclude Include="loop_train_layer.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="scale_layer.h" />
     <ClInclude Include="tanh_layer.h" />
@@ -166,6 +167,7 @@
     <ClCompile Include="image_data_layer.cpp" />
     <ClCompile Include="inner_product_layer.cpp" />
     <ClCompile Include="layer.cpp" />
+    <ClCompile Include="loop_train_layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="memory.cpp" />
     <ClCompile Include="scale_layer.cpp" />

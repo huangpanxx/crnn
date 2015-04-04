@@ -1,5 +1,6 @@
 #include "network.h"
 #include "utility.h"
+#include "loop_train_layer.h"
 using namespace std;
 
 network::network(const std::string& config, const std::string& plan) {
