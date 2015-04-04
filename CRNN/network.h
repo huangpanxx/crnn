@@ -42,6 +42,7 @@ private:
     block_factory m_block_factory;
     std::vector<std::vector<layer_ptr> > m_activate_layer_seq;
     std::vector<layer_ptr> m_beg_layer_seq;
+    std::vector<layer_ptr> m_loop_train_layers;
     std::unordered_map<std::string, layer_ptr> m_layer_cache;
     data_layer* m_data_layer;
     loss_layer* m_loss_layer;

@@ -56,16 +56,21 @@ bool softmax_loss_layer::forward(){
 
     //stop
     ++m_t;
+
+    CHECK(m_t >= 0 && m_t < label.rows() + 1);
     return m_t < label.rows();
 }
 
 void softmax_loss_layer::backward() {
+    CHECK(!m_output_history.empty());
     auto& error = m_input_block->error();
     auto& output = m_output_history.back();
     array2d label = m_label_block->signal();
     m_output_history.pop_back();
 
     --m_t;
+    CHECK(m_t >= 0 && m_t < label.rows());
+
     OMP_FOR
     for (int i = 0; i < error.size(); ++i) {
         error.at(i) += label.at2(m_t, i) - output.at(i);
