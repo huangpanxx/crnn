@@ -18,6 +18,7 @@ void loop_train_layer::setup_params(){
 }
 
 bool loop_train_layer::begin_seq(){
+    m_forward_history.clear();
     for (auto& layer : m_layers){
         if (!layer->begin_seq()){
             return false;
@@ -29,6 +30,7 @@ bool loop_train_layer::begin_seq(){
 bool loop_train_layer::forward(){
     while (true){
         for (auto& layer : m_layers){
+            m_forward_history.push_back(layer);
             if (!layer->forward()){
                 goto end;
             }
@@ -39,7 +41,7 @@ end:
 }
 
 void loop_train_layer::backward(){
-    for_each(m_layers.rbegin(), m_layers.rend(), [](layer_ptr& layer){
+    for_each(m_forward_history.rbegin(), m_forward_history.rend(), [](layer_ptr& layer){
         layer->backward();
     });
 }

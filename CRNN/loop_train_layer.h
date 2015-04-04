@@ -16,6 +16,7 @@ public:
 
 private:
     std::vector<layer_ptr> m_layers;
+    std::vector<layer_ptr> m_forward_history;
 };
 
 #endif
