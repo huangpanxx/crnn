@@ -6,7 +6,7 @@ array_layer::array_layer(
     std::vector<array_sample> samples,
     std::shared_ptr<block> data,
     std::shared_ptr<block> label,
-    int batch,int iter,int loop) {
+    int batch, int iter, int loop) {
     CHECK(samples.size() != 0);
     cout << samples.size() << " samples loaded ..." << endl;
     this->m_label = label;
@@ -24,7 +24,7 @@ array_layer::array_layer(
     }
 
     cout << "data dims:";
-    for (int i = 0; i < (int)data_dims.size(); ++i){
+    for (int i = 0; i < (int) data_dims.size(); ++i){
         if (i) cout << ",";
         cout << data_dims[i];
     }
@@ -32,15 +32,18 @@ array_layer::array_layer(
 }
 
 bool array_layer::begin_seq() {
-   int max_index = (int)this->m_samples.size() * this->m_iter * m_loop;
-   CHECK(max_index > 0);
-   bool ok = m_index + 1 < max_index;
-   if (ok) {
-       m_index += 1;
-   }
-   this->m_data->error().clear(0);
-   this->m_label->error().clear(0);
-   return ok;
+    int group = (int)this->m_samples.size() * this->m_iter;
+    m_loop = min(m_loop, INT_MAX / group);
+    int max_index = group * m_loop;
+    CHECK(max_index > 0);
+
+    bool ok = m_index + 1 < max_index;
+    if (ok) {
+        m_index += 1;
+    }
+    this->m_data->error().clear(0);
+    this->m_label->error().clear(0);
+    return ok;
 }
 
 
@@ -50,8 +53,9 @@ void array_layer::setup_block() {
     if (this->m_data->empty()) {
         this->m_data->resize(sample.data().dims());
         this->m_label->resize(sample.label().dims());
-    } else {
-        CHECK(cmp_vec(this->m_data->dims(),sample.data().dims()));
+    }
+    else {
+        CHECK(cmp_vec(this->m_data->dims(), sample.data().dims()));
         CHECK(cmp_vec(this->m_label->dims(), sample.label().dims()));
     }
 }
@@ -80,12 +84,12 @@ void array_layer::move_to_next_batch() {
 }
 
 void array_layer::save(std::ostream& os) {
-    write_val_to_stream(os, (int)m_index);
+    write_val_to_stream(os, (int) m_index);
 }
 
 void array_layer::load(std::istream& is) {
     read_val_from_stream(is, m_index);
-    if (m_index >= (int)this->m_samples.size() * this->m_iter * m_loop 
+    if (m_index >= (int)this->m_samples.size() * this->m_iter * m_loop
         || m_index < 0) {
         m_index = 0;
     }
