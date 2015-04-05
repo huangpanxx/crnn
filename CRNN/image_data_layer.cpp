@@ -94,7 +94,7 @@ layer_ptr create_image_layer(
     }
 
     //default loop
-    int loop = 100;
+    int loop = INT_MAX;
     if (config.contains("loop")){
         loop = (int) config.get("loop").get<double>();
     }
