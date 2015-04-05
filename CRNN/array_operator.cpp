@@ -11,7 +11,7 @@ array_operator_ptr get_default_array_operator(){
 #ifdef _DEBUG
     const bool try_use_gpu = true;
 #else
-    const bool try_use_gpu = false;
+    const bool try_use_gpu = true;
 #endif
 
     if (!ptr){
