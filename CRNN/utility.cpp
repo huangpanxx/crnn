@@ -8,7 +8,7 @@ extern "C" {
 }
 
 array3d resize(const array3d& src, int width, int height) {
-    array3d dst(height, width, src.channels());
+    array3d dst(src.channels(), height, width);
     for (int ch = 0; ch < dst.channels(); ++ch) {
         OMP_FOR
         for (int r = 0; r < dst.rows(); ++r) {
@@ -41,7 +41,7 @@ array3d imread(const std::string& path) {
     unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 0);
     CHECK(data);
     CHECK(n == 1 || n == 3 || n == 4);
-    array3d image(h, w, 3); //rgb
+    array3d image(3, h, w); //rgb
     for (int x = 0; x < w; ++x) {
         for (int y = 0; y < h; ++y) {
             unsigned char* pt = data + n * (y * w + x);
@@ -222,7 +222,7 @@ std::string promote_file_name(const std::string& promote){
 void softmax_normalize(const arraykd& src, arraykd& dst) {
     assert(src.size() == dst.size());
     int sz = src.size();
-    const float mmax = src.max();
+    const float mmax = src.max_val();
     OMP_FOR
     for (int i = 0; i < sz; ++i) {
         dst.at(i) = exp(src.at(i) - mmax);
@@ -234,7 +234,7 @@ void softmax_normalize(const arraykd& src, array2d& dst, int row){
     assert(src.size() == dst.cols());
     assert(row >= 0 && row < dst.rows());
     int sz = src.size();
-    const float mmax = src.max();
+    const float mmax = src.max_val();
     //exp
     OMP_FOR
     for (int i = 0; i < sz; ++i) {

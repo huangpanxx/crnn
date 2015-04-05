@@ -43,6 +43,7 @@ bool array_layer::begin_seq() {
     }
     this->m_data->error().clear(0);
     this->m_label->error().clear(0);
+
     return ok;
 }
 
@@ -61,10 +62,9 @@ void array_layer::setup_block() {
 }
 
 bool array_layer::forward() {
-    int group = m_iter*m_batch;
+    int group = m_iter * m_batch;
     int k = m_index / group;
     int idx = (k * m_batch + (m_index % group) % m_batch) % (int) m_samples.size();
-
     auto &sample = this->m_samples[idx];
     this->m_data->new_signal() = sample.data();
     this->m_label->new_signal() = sample.label();

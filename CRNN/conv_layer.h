@@ -19,15 +19,15 @@ public:
     virtual void backward();
     virtual void end_batch(int size);
 
-    std::vector<array3d> weights(){
+    array4d& weights(){
         return m_weights;
     }
 
-    void set_weights(const std::vector<array3d>& weights) {
+    void set_weights(const array4d& weights) {
         this->m_weights = weights;
     }
 
-    arraykd bias() {
+    arraykd& bias() {
         return m_bias;
     }
 
@@ -42,10 +42,10 @@ private:
     block_ptr m_input_block;
     block_ptr m_output_block;
 
-    std::vector<array3d> m_weights;
+    array4d m_weights;
     arraykd m_bias;
 
-    std::vector<array3d> m_grad_weights;
+    array4d m_grad_weights;
     arraykd m_grad_bias;
 
     std::vector<array3d> m_input_history;

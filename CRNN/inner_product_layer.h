@@ -2,6 +2,7 @@
 #define INNER_PRODUCT_LAYER_H
 
 #include "layer.h"
+#include "array_operator.h"
 
 class inner_product_layer : public layer {
 public:

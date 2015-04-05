@@ -6,6 +6,7 @@ layer::layer() {
     m_momentum_decay = 0.9f;
     m_name = "";
     m_enable_bp = true;
+    this->m_array_operator = get_default_array_operator();
 }
 
 std::map<string, layer_factory_fn>& get_layer_fns(){

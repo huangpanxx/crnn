@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClInclude Include="add_layer.h" />
     <ClInclude Include="array_layer.h" />
+    <ClInclude Include="array_operator.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="conv_layer.h" />
     <ClInclude Include="gru_layer.h" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClCompile Include="add_layer.cpp" />
     <ClCompile Include="array_layer.cpp" />
+    <ClCompile Include="array_operator.cpp" />
     <ClCompile Include="conv_layer.cpp" />
     <ClCompile Include="gru_layer.cpp" />
     <ClCompile Include="image_data_layer.cpp" />

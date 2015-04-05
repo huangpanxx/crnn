@@ -94,10 +94,12 @@ network::network(const std::string& config, const std::string& plan) {
     }
 
     //setup block
+    cout << "setup blocks ..." << endl;
     for_each(setup_block_seq.begin(), setup_block_seq.end(),
         [](layer_ptr &x){ x->setup_block(); });
 
     //setup params
+    cout << "setup params ..." << endl;
     for_each(setup_params_seq.begin(), setup_params_seq.end(),
         [](layer_ptr &x){ x->setup_params(); });
 
@@ -113,6 +115,8 @@ network::network(const std::string& config, const std::string& plan) {
     //save epoch
     this->m_save_epoch = (int) m_config.get("save_epoch").get<double>();
     CHECK(m_save_epoch >= 1);
+
+    cout << "network created ." << endl;
 }
 
 
@@ -251,22 +255,24 @@ void network::train() {
 
 
         //forward
-        for (auto &layers : this->m_activate_layer_seq){
-            for (auto& layer : layers){
+        for (auto &layers : this->m_activate_layer_seq) {
+            for (auto& layer : layers) {
                 forward_history.push_back(layer);
-                if (!layer->forward()){
+                if (!layer->forward()) {
                     goto end_forward;
                 }
             }
         }
         end_forward:
 
+
         //backward
         for_each(forward_history.rbegin(), 
             forward_history.rend(),
             [](layer_ptr &layer) {
-                layer->backward();
+            layer->backward();
         });
+
 
         //info
         printf("epoch %d, iter %d.\r", epoch, iter);
@@ -294,12 +300,15 @@ arraykd network::forward(){
     }
 
     //forward
-    int index = std::min((int)this->m_activate_layer_seq.size() - 1, m_t);
+    int index = min((int)this->m_activate_layer_seq.size() - 1, m_t);
     auto acti_seq = this->m_activate_layer_seq[index];
     for (auto &layer : acti_seq){
         layer->forward();
     }
 
+    //add t
     m_t += 1;
+
+    //return signal
     return m_block_factory.get_block(m_output_block_id)->signal();
 }

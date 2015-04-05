@@ -4,6 +4,7 @@
 #include "common.h"
 #include "memory.h"
 #include "picojson.h"
+#include "array_operator.h"
 
 class layer {
 public:
@@ -31,11 +32,16 @@ public:
         m_enable_bp = b;
     }
 
+    array_operator_ptr& arr_op() {
+        return this->m_array_operator;
+    }
+
 private:
     float m_learn_rate;
     float m_momentum_decay;
     bool m_enable_bp;
     std::string m_name;
+    array_operator_ptr m_array_operator;
 };
 
 class loss_layer: public layer {

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CRNN.gui
 {
-    public class CaptchaEngine
+    public class CaptchaEngine : IDisposable
     {
         Network _network = null;
         public CaptchaEngine()
@@ -42,6 +42,14 @@ namespace CRNN.gui
                 }
                 cap.Time = (float)(DateTime.Now - now).TotalMilliseconds;
                 return cap;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_network != null)
+            {
+                _network.Dispose();
             }
         }
     }

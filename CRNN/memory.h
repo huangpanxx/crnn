@@ -135,7 +135,7 @@ public:
         copy_data(src, *this);
     }
 
-    float max() const{
+    float max_val() const{
         int sz = this->size();
         assert(sz > 0);
         float mmax = this->at(0);
@@ -145,7 +145,7 @@ public:
         return mmax;
     }
 
-    float min(){
+    float min_val(){
         int sz = this->size();
         assert(sz > 0);
         float mmin = this->at(0);
@@ -236,7 +236,7 @@ public:
 
 class array3d : public arraykd {
 public:
-    array3d(int rows, int cols, int channels) : arraykd(rows * cols * channels) {
+    array3d(int channels, int rows, int cols) : arraykd(rows * cols * channels) {
         this->m_pmeta->dim = 3;
         this->m_pmeta->dimk[0] = rows;
         this->m_pmeta->dimk[1] = cols;
@@ -259,13 +259,54 @@ public:
     inline int rows() const { return dim(0); }
     inline int cols() const { return dim(1); }
     inline int channels() const { return dim(2); }
+}; 
+
+class array4d : public arraykd {
+public:
+    array4d() : arraykd(0){
+        this->m_pmeta->dim = 4;
+        this->m_pmeta->dimk[0] = 0;
+        this->m_pmeta->dimk[1] = 0;
+        this->m_pmeta->dimk[2] = 0;
+        this->m_pmeta->dimk[3] = 0;
+        this->copy_meta();
+    }
+
+    array4d(int nums, int channels,int rows, int cols)
+        : arraykd(rows * cols * channels * nums) {
+        this->m_pmeta->dim = 4;
+        this->m_pmeta->dimk[0] = rows;
+        this->m_pmeta->dimk[1] = cols;
+        this->m_pmeta->dimk[2] = channels;
+        this->m_pmeta->dimk[3] = nums;
+        this->copy_meta();
+    }
+
+    array4d(const arraykd& arr) : arraykd(arr) {
+        assert(arr.dim() == 4);
+    }
+
+    inline float& at4(int num, int channel, int row, int col) const {
+        int _rows = rows(), _cols = cols(), _channels = channels(), _nums = this->nums();
+        assert(row >= 0 && row < _rows);
+        assert(col >= 0 && col < _cols);
+        assert(channel >= 0 && channel < _channels);
+        assert(num >= 0 && num < _nums);
+        //this is slow
+        return this->at(num*_channels*_rows*_cols + channel*_rows*_cols + row*_cols + col);
+    }
+
+    inline int rows() const { return dim(0); }
+    inline int cols() const { return dim(1); }
+    inline int channels() const { return dim(2); }
+    inline int nums() const { return dim(3); }
 };
 
 
 //b & c are vertical vectors
 inline void mul_addv(const array2d& a, const arraykd&b, arraykd& c){
-    assert(a.rows() == c.size());
-    assert(a.cols() == b.size());
+    CHECK(a.rows() == c.size());
+    CHECK(a.cols() == b.size());
     int row = a.rows(), col = a.cols();
     OMP_FOR
     for (int i = 0; i < row; ++i){
@@ -369,8 +410,8 @@ public:
     }
 
     void resize(int rows, int cols, int channels){
-        m_signal = array3d(rows, cols, channels);
-        m_error = array3d(rows, cols, channels);
+        m_signal = array3d(channels, rows, cols);
+        m_error = array3d(channels, rows, cols);
     }
 
     void resize(const std::vector<int> &dims){
