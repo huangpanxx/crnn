@@ -8,6 +8,19 @@ namespace Concurrency{
     class accelerator_view;
 }
 
+class array_operator;
+
+class array_wrapper {
+public:
+    array_wrapper(arraykd src, std::shared_ptr<array_operator> &op);
+    ~array_wrapper();
+
+private:
+    arraykd m_arraykd;
+    std::shared_ptr<array_operator> m_op;
+    void *m_array_ptr;
+};
+
 class array_operator {
 public:
     array_operator(){ this->m_accelerator_ptr = 0; }
@@ -21,10 +34,11 @@ public:
 
     void mul_addv(const array2d& A, const arraykd& B, arraykd& C);
 
-private:
     inline bool use_amp() {
         return this->m_accelerator_ptr != 0;
     }
+
+private:
     Concurrency::accelerator_view *m_accelerator_ptr;
     bool m_use_amp;
 };

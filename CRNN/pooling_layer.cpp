@@ -44,19 +44,19 @@ bool max_pooling_layer::forward() {
     const int index = m_size * m_size;
 
     OMP_FOR
-    for (int ch = 0; ch < channels; ++ch){
         for (int r = 0; r < orows; ++r) {
             for (int c = 0; c < ocols; ++c) {
+    for (int ch = 0; ch < channels; ++ch){
                 //left top corner
                 const int br = r * m_stride, bc = c * m_stride;
 
                 //first
-                float mmax = input.at3(ch, br, bc);
+                float mmax = input.at3(br, bc, ch);
                 int k = 0;
                 for (int i = 1; i < index; ++i) {
                     const int nr = br + i % m_size, nc = bc + i / m_size;
                     if (nr < irows && nc < icols) {
-                        const float val = input.at3(ch, nr, nc);
+                        const float val = input.at3(nr, nc, ch);
                         if (val > mmax) {
                             k = i;
                             mmax = val;
@@ -65,10 +65,10 @@ bool max_pooling_layer::forward() {
                 }
 
                 //output
-                output.at3(ch, r, c) = mmax;
+                output.at3( r, c,ch) = mmax;
 
                 //record max index
-                max_index.at3(ch,r, c) = (float)k;
+                max_index.at3(r, c,ch) = (float)k;
             }
         }
     }
@@ -86,14 +86,14 @@ void max_pooling_layer::backward() {
 
 
     OMP_FOR
-    for (int ch = 0; ch < channels; ++ch) {
-        for (int r = 0; r < orows; ++r) {
-            for (int c = 0; c < ocols; ++c) {
-                const float err = oerror.at3(ch, r, c);
-                const int idx = (int) max_index.at3(ch, r, c);
+    for (int r = 0; r < orows; ++r) {
+        for (int c = 0; c < ocols; ++c) {
+            for (int ch = 0; ch < channels; ++ch) {
+                const float err = oerror.at3(r, c, ch);
+                const int idx = (int) max_index.at3(r, c, ch);
                 const int nrow = r * m_stride + idx % m_size;
                 const int ncol = c * m_stride + idx / m_size;
-                ierror.at3(ch, nrow, ncol) += err;
+                ierror.at3(nrow, ncol, ch) += err;
             }
         }
     }

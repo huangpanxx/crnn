@@ -8,11 +8,11 @@ extern "C" {
 }
 
 array3d resize(const array3d& src, int width, int height) {
-    array3d dst(src.channels(), height, width);
-    for (int ch = 0; ch < dst.channels(); ++ch) {
-        OMP_FOR
-        for (int r = 0; r < dst.rows(); ++r) {
-            for (int c = 0; c < dst.cols(); ++c) {
+    array3d dst(height, width, src.channels());
+    OMP_FOR
+    for (int r = 0; r < dst.rows(); ++r) {
+        for (int c = 0; c < dst.cols(); ++c) {
+            for (int ch = 0; ch < dst.channels(); ++ch) {
                 float fr = float(r) / dst.rows() * src.rows();
                 float fc = float(c) / dst.cols() * src.cols();
 
@@ -21,15 +21,15 @@ array3d resize(const array3d& src, int width, int height) {
                 int nr2 = min(nr1 + 1, src.rows() - 1);
                 int nc2 = min(nc1 + 1, src.cols() - 1);
 
-                float f1 = src.at3(ch, nr1, nc1), f2 = src.at3(ch, nr1, nc2);
-                float f3 = src.at3(ch, nr2, nc1), f4 = src.at3(ch, nr2, nc2);
+                float f1 = src.at3(nr1, nc1, ch), f2 = src.at3(nr1, nc2, ch);
+                float f3 = src.at3(nr2, nc1, ch), f4 = src.at3(nr2, nc2, ch);
 
                 float f = f1*(nr1 + 1 - fr)*(nc1 + 1 - fc)
                     + f2*(nr1 + 1 - fr)*(fc - nc1)
                     + f3*(fr - nr1)*(nc1 + 1 - fc)
                     + f4*(fr - nr1)*(fc - nc1);
 
-                dst.at3(ch, r, c) = f;
+                dst.at3(r, c, ch) = f;
             }
         }
     }

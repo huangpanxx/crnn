@@ -55,7 +55,8 @@ public:
     bool operator ==(const arraykd& b) const { return b.data() == data(); }
 
     inline float& at(int pos) const {
-        assert(pos >= 0 && pos < size());
+        assert(pos >= 0);
+        assert(pos < size());
         return m_data[pos];
     }
 
@@ -236,7 +237,7 @@ public:
 
 class array3d : public arraykd {
 public:
-    array3d(int channels, int rows, int cols) : arraykd(rows * cols * channels) {
+    array3d(int rows, int cols, int channels) : arraykd(rows * cols * channels) {
         this->m_pmeta->dim = 3;
         this->m_pmeta->dimk[0] = rows;
         this->m_pmeta->dimk[1] = cols;
@@ -248,12 +249,12 @@ public:
         assert(arr.dim() == 3);
     }
 
-    inline float& at3(int channel, int row, int col) const {
+    inline float& at3(int row, int col, int channel) const {
         int _rows = rows(), _cols = cols(), _channels = channels();
         assert(row >= 0 && row < _rows);
         assert(col >= 0 && col < _cols);
         assert(channel >= 0 && channel < _channels);
-        return this->at(channel*_rows*_cols + row*_cols + col);
+        return this->at(_channels*_cols*row + col*_channels + channel);
     }
 
     inline int rows() const { return dim(0); }
@@ -272,13 +273,13 @@ public:
         this->copy_meta();
     }
 
-    array4d(int nums, int channels,int rows, int cols)
+    array4d(int nums, int rows, int cols, int channels)
         : arraykd(rows * cols * channels * nums) {
         this->m_pmeta->dim = 4;
-        this->m_pmeta->dimk[0] = rows;
-        this->m_pmeta->dimk[1] = cols;
-        this->m_pmeta->dimk[2] = channels;
-        this->m_pmeta->dimk[3] = nums;
+        this->m_pmeta->dimk[0] = nums;
+        this->m_pmeta->dimk[1] = rows;
+        this->m_pmeta->dimk[2] = cols;
+        this->m_pmeta->dimk[3] = channels;
         this->copy_meta();
     }
 
@@ -286,14 +287,14 @@ public:
         assert(arr.dim() == 4);
     }
 
-    inline float& at4(int num, int channel, int row, int col) const {
+    inline float& at4(int num, int row, int col, int channel) const {
         int _rows = rows(), _cols = cols(), _channels = channels(), _nums = this->nums();
         assert(row >= 0 && row < _rows);
         assert(col >= 0 && col < _cols);
         assert(channel >= 0 && channel < _channels);
         assert(num >= 0 && num < _nums);
         //this is slow
-        return this->at(num*_channels*_rows*_cols + channel*_rows*_cols + row*_cols + col);
+        return this->at(num*_rows*_cols*_channels + row*_cols*_channels + col*_channels + channel);
     }
 
     inline int rows() const { return dim(0); }
@@ -410,8 +411,8 @@ public:
     }
 
     void resize(int rows, int cols, int channels){
-        m_signal = array3d(channels, rows, cols);
-        m_error = array3d(channels, rows, cols);
+        m_signal = array3d(rows, cols, channels);
+        m_error = array3d(rows, cols, channels);
     }
 
     void resize(const std::vector<int> &dims){

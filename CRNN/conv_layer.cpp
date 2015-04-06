@@ -50,7 +50,7 @@ void conv_layer::setup_params() {
 
     //weights
     if (m_weights.size() == 0){
-        m_weights = array4d(m_kernel_num, channels, m_kernel_size, m_kernel_size);
+        m_weights = array4d(m_kernel_size, m_kernel_size, channels, m_kernel_num);
         m_weights.rand(-bound, bound);
     }
 
@@ -91,19 +91,19 @@ bool conv_layer::forward() {
 
     //for each output point
     OMP_FOR
-    for (int och = 0; och < ochannels; ++och){
-        float bias = m_bias.at(och);
-        for (int r = 0; r < orows ; ++r) {
-            for (int c = 0; c < ocols ; ++c) {
-                float &output_unit = output.at3(och, r, c);
+    for (int r = 0; r < orows; ++r) {
+        for (int c = 0; c < ocols; ++c) {
+            for (int och = 0; och < ochannels; ++och){
+                float bias = m_bias.at(och);
+                float &output_unit = output.at3(r, c, och);
                 output_unit = bias;
                 int y = r * m_kernel_stride, x = c * m_kernel_stride;
                 //for input region
-                for (int ch = 0; ch < channels; ++ch){
-                    for (int dr = 0; dr < m_kernel_size; ++dr){
-                        for (int dc = 0; dc < m_kernel_size; ++dc) {
+                for (int dr = 0; dr < m_kernel_size; ++dr){
+                    for (int dc = 0; dc < m_kernel_size; ++dc) {
+                        for (int ch = 0; ch < channels; ++ch){
                             int nr = y + dr, nc = x + dc;
-                            output_unit += input.at3(ch, nr, nc) * m_weights.at4(och, ch, dr, dc);
+                            output_unit += input.at3(nr, nc, ch) * m_weights.at4(och, dr, dc, ch);
                         }
                     }
                 }
@@ -127,19 +127,19 @@ void conv_layer::backward() {
 
         //for output point
         OMP_FOR
-        for (int och = 0; och < ochannels; ++och) {
-            auto& gb = m_grad_bias.at(och);
-            for (int r = 0; r < orows; ++r) {
-                for (int c = 0; c < ocols; ++c) {
-                    float err = oerror.at3(och, r, c);
+        for (int r = 0; r < orows; ++r) {
+            for (int c = 0; c < ocols; ++c) {
+                for (int och = 0; och < ochannels; ++och) {
+                    auto& gb = m_grad_bias.at(och);
+                    float err = oerror.at3(r, c, och);
                     gb += err;
                     int y = r * m_kernel_stride, x = c * m_kernel_stride;
-                    for (int ich = 0; ich < channels; ++ich){
-                        for (int dr = 0; dr < m_kernel_size; ++dr) {
-                            for (int dc = 0; dc < m_kernel_size; ++dc) {
+                    for (int dr = 0; dr < m_kernel_size; ++dr) {
+                        for (int dc = 0; dc < m_kernel_size; ++dc) {
+                            for (int ich = 0; ich < channels; ++ich){
                                 int nr = y + dr, nc = x + dc;
-                                ierror.at3(ich, nr, nc) += err * m_weights.at4(och, ich, dr, dc);
-                                m_grad_weights.at4(och, ich, dr, dc) += err * input.at3(ich, nr, nc);
+                                ierror.at3(nr, nc, ich) += err * m_weights.at4(och, dr, dc, ich);
+                                m_grad_weights.at4(och, dr, dc,ich) += err * input.at3(nr, nc, ich);
                             }
                         }
                     }

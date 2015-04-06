@@ -3,12 +3,30 @@
 using namespace std;
 using namespace concurrency;
 
-void array_operator::conv(const array3d& src, const array4d& kernel, int stride, array3d& dst){
+
+array_wrapper::array_wrapper(arraykd src, shared_ptr<array_operator> &op){
+    //this->m_arraykd = src;
+    //this->m_op = op;
+    //this->m_array_ptr = 0;
+    //if (this->m_op->use_amp()) {
+    //    float* data = src.data();
+    //    int dim = src.dim();
+    //    if (dim == 1) {
+    //        m_array_ptr = new array<float, 1>(src.size(), data);
+    //    }
+    //}
+}
+
+array_wrapper::~array_wrapper(){
 
 }
 
-void array_operator::deconv(const array3d& src, const array4d& kernel, int stride, array3d& dst){
+void array_operator::conv(const array3d& src, const array4d& kernel, int stride, array3d& dst){
+    CHECK(false);
+}
 
+void array_operator::deconv(const array3d& src, const array4d& kernel, int stride, array3d& dst){
+    CHECK(false);
 }
 
 void array_operator::mul_addv(const array2d& A, const arraykd& B, arraykd& C){
@@ -20,15 +38,18 @@ void array_operator::mul_addv(const array2d& A, const arraykd& B, arraykd& C){
     array_view<float, 1> c(C.size(), C.data());
 
     const int cols = A.cols();
-    parallel_for_each(c.extent, [=](index<1>& idx) restrict(amp)
+    parallel_for_each(c.extent, [=](index<1> idx) restrict(amp)
     {
-        int row = idx[0];
-        float sum = 0;
-        for (int i = 0; i < cols; ++i){
-            sum += a(row, i)*b(i);
+        for (int i = 0; i < 2000; ++i){
+            int row = idx[0];
+            float sum = 0;
+            for (int i = 0; i < cols; ++i) {
+                sum += a(row, i)*b(i);
+            }
+            c(idx) += sum;
         }
-        c(idx) += sum;
     });
+
 }
 
 array_operator_ptr get_default_array_operator(){
