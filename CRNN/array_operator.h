@@ -16,8 +16,10 @@ public:
     }
 
     //functions
-    //void conv(const array3d& src, const array4d& kernel, int stride, array3d& dst);
-    //void deconv(const array3d& src, const array4d& kernel, int stride, array3d& dst);
+    void conv(const array3d& src, const array4d& kernel, int stride, array3d& dst);
+    void deconv(const array3d& src, const array4d& kernel, int stride, array3d& dst);
+
+    void mul_addv(const array2d& A, const arraykd& B, arraykd& C);
 
 private:
     inline bool use_amp() {
