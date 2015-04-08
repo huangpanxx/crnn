@@ -21,11 +21,6 @@ public:
         return m_label_dict[k];
     }
 
-    //dims
-    std::vector<int> input_dims() const {
-        return m_input_dims;
-    }
-
     void add_layer(layer_ptr& layer);
 
     block_ptr block(const std::string& id) {
@@ -50,15 +45,14 @@ private:
     std::unordered_map<std::string, layer_ptr> m_layer_cache;
     data_layer* m_data_layer;
     loss_layer* m_loss_layer;
+    feed_data_layer* m_feed_layer;
     std::string m_model_file;
     picojson::value m_config;
-    std::vector<int> m_input_dims;
     int m_save_epoch;
     float m_stop_loss;
     float m_learn_rate;
     int m_t;
     std::string m_output_block_id;
-    std::string m_input_block_id;
 };
 
 #endif

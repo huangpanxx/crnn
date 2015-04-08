@@ -151,19 +151,10 @@ void train_and_test_network(const string& filename) {
             //read image
             auto file_name = promote_file_name("image file");
             auto image = imread(file_name);
-            auto dims = predict_net.input_dims();
-
-            //resize image
-            CHECK(dims.size() == 3 && dims[2] == 3);
-            int width = dims[1], height = dims[0];
-            if (width != image.cols() || height != image.rows()){
-                image = resize(image, width, height);
-            }
 
             //recongnize
             int start_time = clock();
             predict_net.set_input(image);
-
 
 
             //read output

@@ -16,14 +16,6 @@ network::network(const std::string& config, const std::string& plan) {
     m_learn_rate = (float) m_config.get("learn_rate").get<double>();
     CHECK(m_learn_rate >= 0);
 
-    //input dims
-    CHECK(m_config.contains("input_dims"));
-    auto dims = m_config.get("input_dims").get<picojson::array>();
-    for (auto jdim : dims) {
-        int d = (int) jdim.get<double>();
-        m_input_dims.push_back(d);
-    }
-
     //dict
     CHECK(m_config.contains("dict"));
     auto dict = m_config.get("dict").get<picojson::array>();
@@ -36,16 +28,19 @@ network::network(const std::string& config, const std::string& plan) {
     auto plan_config = m_config.get(plan);
 
     //predict
-    if (plan_config.contains("input")) {
-        CHECK(plan_config.contains("output"));
-        m_input_block_id = plan_config.get("input").get<string>();
+    if (plan_config.contains("output")) {
         m_output_block_id = plan_config.get("output").get<string>();
-        auto input_block = m_block_factory.get_block(m_input_block_id);
-        input_block->resize(m_input_dims);
     }
     else{
-        m_input_block_id = "";
         m_output_block_id = "";
+    }
+
+    if (plan_config.contains("feed")){
+        auto name = plan_config.get("feed").get<string>();
+        m_feed_layer = dynamic_cast<feed_data_layer*>(this->get_layer(name).get());
+    }
+    else{
+        m_feed_layer = 0;
     }
 
     //create layers
@@ -284,10 +279,9 @@ void network::train() {
 }
 
 void network::set_input(const arraykd& data){
-    CHECK(m_input_block_id != "");
+    CHECK(m_feed_layer);
+    m_feed_layer->set_data(data);
     this->m_t = 0;
-    auto &input = this->m_block_factory.get_block(this->m_input_block_id);
-    input->signal() = data; //we don't need input has the same size
 }
 
 arraykd network::forward() {
@@ -302,7 +296,7 @@ arraykd network::forward() {
     int index = min((int)this->m_activate_layer_seq.size() - 1, m_t);
     auto acti_seq = this->m_activate_layer_seq[index];
     for (auto &layer : acti_seq){
-        layer->forward();
+        layer->forward_and_report();
     }
 
     //add t

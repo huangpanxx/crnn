@@ -23,13 +23,14 @@ private:
 };
 
 
-class image_slice_layer : public layer {
+class image_slice_layer : public feed_data_layer {
 public:
     image_slice_layer(block_ptr data_block,
         int width, int height, int stride);
+    virtual void setup_block();
     virtual bool begin_seq();
     virtual bool forward();
-    void set_data(arraykd& image);
+    void set_data(const arraykd& image);
     
 private:
     image_split_helper m_helper;
@@ -40,15 +41,18 @@ private:
 
 class label_slice_layer : public layer {
 public:
-    label_slice_layer(block_ptr label_block);
+    label_slice_layer(block_ptr label_block, int label_size);
+    virtual void setup_block();
     virtual bool begin_seq();
     virtual bool forward();
+    virtual void backward();
     void set_label(const std::vector<int> &labels);
 
 private:
     block_ptr m_label_block;
     std::vector<int> m_labels;
     int m_t;
+    int m_label_size;
 };
 
 class image_split_layer : public data_layer {
@@ -63,6 +67,7 @@ public:
         block_ptr label_block);
 
     virtual void setup_block();
+    virtual void setup_params();
     virtual bool begin_seq();
     virtual bool forward();
     virtual void save(std::ostream& os);
