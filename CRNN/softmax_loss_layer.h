@@ -35,7 +35,6 @@ private:
     std::vector<arraykd> m_output_history;
     float m_loss_sum;
     int m_loss_num;
-    int m_t;
     bool m_report;
 };
 

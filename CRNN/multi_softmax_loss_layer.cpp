@@ -1,5 +1,6 @@
 #include "multi_softmax_loss_layer.h"
 #include "utility.h"
+#include "network.h"
 using namespace std;
 
 multi_softmax_loss_layer::multi_softmax_loss_layer(
@@ -93,7 +94,7 @@ void multi_softmax_loss_layer::end_batch(int size){
 layer_ptr create_multi_softmax_loss_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf){
+    network* net){
     //inputs
     auto input_ids_arr = config.get("inputs").get<picojson::array>();
     vector<string> input_ids;
@@ -102,8 +103,8 @@ layer_ptr create_multi_softmax_loss_layer(
         input_ids.push_back(id);
     }
     //label
-    auto input_blocks = bf.get_blocks(input_ids);
-    auto label_block = bf.get_block("label");
+    auto input_blocks = net->blocks(input_ids);
+    auto label_block = net->block("label");
     return layer_ptr(new multi_softmax_loss_layer(input_blocks, label_block));
 }
 

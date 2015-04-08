@@ -1,11 +1,13 @@
 #include "layer.h"
+#include "image_split_layer.h"
 using namespace std;
 
-layer::layer() { 
+layer::layer() {
     m_learn_rate = 0.005f + (::rand() / RAND_MAX)*0.005f;
     m_momentum_decay = 0.9f;
-    m_name = "";
+    m_name = "unname";
     m_enable_bp = true;
+    m_counter = 0;
     this->m_array_operator = get_default_array_operator();
 }
 
@@ -15,7 +17,6 @@ std::map<string, layer_factory_fn>& get_layer_fns(){
 }
 
 void register_layer_factory(string name, layer_factory_fn fn){
-    //printf("layer %s registed.\n", name.c_str());
     get_layer_fns()[name] = fn;
 }
 
@@ -64,6 +65,7 @@ static bool dummy_fn(){
     multi_softmax_loss_layer({}, block_ptr(0));
     image_data_layer("", "", 0, 0, 1, 1, 1, 1);
     softmax_layer(0, 0);
+    image_split_layer("", "", 0, 0, 0, 0, 0, 0, 0);
     return true;
 }
 

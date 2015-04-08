@@ -14,18 +14,19 @@ bool loop_train_layer::forward(){
     while (true){
         for (auto& layer : m_layers){
             m_forward_history.push_back(layer);
-            if (!layer->forward()){
-                return false;
+            if (!layer->forward_and_report()){
+                goto forward_end;
             }
         }
     }
+forward_end:
     return true;
 }
 
 void loop_train_layer::backward(){
     for_each(m_forward_history.rbegin(), m_forward_history.rend(),
         [](layer_ptr& layer){
-        layer->backward();
+        layer->backward_and_report();
     });
 }
 

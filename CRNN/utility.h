@@ -66,4 +66,6 @@ void softmax_normalize(const arraykd& src, arraykd& dst);
 
 void softmax_normalize(const arraykd& src, array2d& dst, int row);
 
+std::vector<std::pair<std::string, std::vector<int> > > read_label_file(const std::string& filename);
+
 #endif

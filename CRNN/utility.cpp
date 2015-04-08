@@ -41,7 +41,7 @@ array3d imread(const std::string& path) {
     unsigned char* data = stbi_load(path.c_str(), &w, &h, &n, 0);
     CHECK(data);
     CHECK(n == 1 || n == 3 || n == 4);
-    array3d image(3, h, w); //rgb
+    array3d image(h, w, 3); //rgb
     for (int x = 0; x < w; ++x) {
         for (int y = 0; y < h; ++y) {
             unsigned char* pt = data + n * (y * w + x);
@@ -50,7 +50,7 @@ array3d imread(const std::string& path) {
                 if (n == 1) { val = pt[0] / 255.0f; }
                 else if (n == 3) { val = pt[ch] / 255.0f; }
                 else if (n == 4) { val = pt[ch] * pt[3] / (255.0f * 255.0f); }
-                image.at3(ch, y, x) = val;
+                image.at3(y, x, ch) = val;
             }
         }
     }
@@ -250,4 +250,37 @@ void softmax_normalize(const arraykd& src, array2d& dst, int row){
     for (int i = 0; i < sz; ++i){
         dst.at2(row, i) /= ssum;
     }
+}
+
+
+std::vector<std::pair<std::string, std::vector<int> > > read_label_file(const string& filename){
+    ifstream fin(filename);
+    CHECK(fin);
+    vector<pair<string, vector<int> > > ans;
+    string line = "";
+    while (getline(fin, line), fin){
+        int pos = (int) line.find('\t');
+        if (pos <= 0) pos = (int) line.find(' ');
+        if (pos <= 0) continue;
+        string file_name = line.substr(0, pos);
+        string label_str = line.substr(pos);
+        if (file_name.empty()) continue;
+
+        stringstream ss(label_str);
+        int label_size = 0;
+        ss >> label_size;
+        vector<int> labels;
+        for (int i = 0; i < label_size; ++i){
+            int nlabel;
+            if (!ss) break;
+            ss >> nlabel;
+            labels.push_back(nlabel);
+        }
+        if ((int)labels.size() != label_size){
+            continue;
+        }
+        ans.push_back({ file_name, labels });
+    }
+    printf("%d samples in total.\n", ans.size());
+    return ans;
 }

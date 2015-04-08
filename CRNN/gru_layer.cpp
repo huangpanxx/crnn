@@ -5,6 +5,7 @@
 #include "tanh_layer.h"
 #include "scale_layer.h"
 #include "add_layer.h"
+#include "network.h"
 using namespace std;
 
 gru_layer::gru_layer(block_ptr input, block_ptr output, int output_num) {
@@ -146,14 +147,14 @@ void gru_layer::load(std::istream& is){
 layer_ptr create_gru_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf) {
+    network* net) {
     CHECK(config.contains("input"));
     CHECK(config.contains("output_num"));
 
     string input_block_id =  config.get("input").get<string>();
     int output_num = (int)config.get("output_num").get<double>();
-    auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(layer_name);
+    auto input_block = net->block(input_block_id);
+    auto output_block = net->block(layer_name);
     return layer_ptr(new gru_layer(input_block, output_block, output_num));
 }
 

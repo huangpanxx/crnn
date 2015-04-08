@@ -1,6 +1,6 @@
 #include "multi_softmax_layer.h"
 #include "utility.h"
-
+#include "network.h"
 using namespace std;
 
 multi_softmax_layer::multi_softmax_layer(
@@ -51,15 +51,15 @@ void multi_softmax_layer::end_batch(int size) {
 layer_ptr create_multi_softmax_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf){
+    network* net) {
     auto input_ids_arr = config.get("inputs").get<picojson::array>();
     vector<string> input_ids;
     for (auto &val : input_ids_arr){
         auto id =  val.get<string>();
         input_ids.push_back(id);
     }
-    auto input_blocks = bf.get_blocks(input_ids);
-    auto output_block = bf.get_block(layer_name);
+    auto input_blocks = net->blocks(input_ids);
+    auto output_block = net->block(layer_name);
     return layer_ptr(new multi_softmax_layer(input_blocks, output_block));
 }
 

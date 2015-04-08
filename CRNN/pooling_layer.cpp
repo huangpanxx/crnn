@@ -1,4 +1,5 @@
 #include "pooling_layer.h"
+#include "network.h"
 using namespace std;
 
 max_pooling_layer::max_pooling_layer(
@@ -44,9 +45,9 @@ bool max_pooling_layer::forward() {
     const int index = m_size * m_size;
 
     OMP_FOR
-        for (int r = 0; r < orows; ++r) {
-            for (int c = 0; c < ocols; ++c) {
-    for (int ch = 0; ch < channels; ++ch){
+    for (int r = 0; r < orows; ++r) {
+        for (int c = 0; c < ocols; ++c) {
+            for (int ch = 0; ch < channels; ++ch){
                 //left top corner
                 const int br = r * m_stride, bc = c * m_stride;
 
@@ -65,10 +66,10 @@ bool max_pooling_layer::forward() {
                 }
 
                 //output
-                output.at3( r, c,ch) = mmax;
+                output.at3(r, c, ch) = mmax;
 
                 //record max index
-                max_index.at3(r, c,ch) = (float)k;
+                max_index.at3(r, c, ch) = (float) k;
             }
         }
     }
@@ -106,12 +107,12 @@ void max_pooling_layer::backward() {
 layer_ptr create_max_pooling_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf) {
+    network* net) {
     CHECK(config.contains("input"));
     CHECK(config.contains("size"));
     auto input_block_id = config.get("input").get<string>();
-    auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(layer_name);
+    auto input_block = net->block(input_block_id);
+    auto output_block = net->block(layer_name);
     int size = (int) config.get("size").get<double>();
     int stride = size;
     if (config.contains("stride")){

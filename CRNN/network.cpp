@@ -116,9 +116,14 @@ network::network(const std::string& config, const std::string& plan) {
     this->m_save_epoch = (int) m_config.get("save_epoch").get<double>();
     CHECK(m_save_epoch >= 1);
 
-    cout << "network created ." << endl;
+    cout << "network is created successfully!" << endl;
 }
 
+void network::add_layer(layer_ptr& layer) {
+    CHECK(!layer->name().empty());
+    CHECK(!this->m_layer_cache.count(layer->name()));
+    this->m_layer_cache[layer->name()] = layer;
+}
 
 vector<layer_ptr> network::get_layers(const picojson::value& val){
     auto arr = val.get<picojson::array>();
@@ -131,7 +136,8 @@ vector<layer_ptr> network::get_layers(const picojson::value& val){
         if (val.is<picojson::array>()) {
             auto sub_layers = get_layers(val);
             layer_ptr loop_layer(new loop_train_layer(sub_layers));
-            m_loop_train_layers.push_back(loop_layer);
+            loop_layer->set_name("loop_layer_" + to_string(m_beg_layer_seq.size()));
+            m_beg_layer_seq.push_back(loop_layer);
             layers.push_back(loop_layer);
         }
     }
@@ -145,17 +151,16 @@ layer_ptr network::get_layer(const std::string &name) {
         for (auto v : arr) {
             if (v.get("name").get<string>() == name){
                 auto type = v.get("type").get<string>();
-                printf("create layer, type = %s, name = %s.\n",
-                    type.c_str(), name.c_str());
+                printf("create layer, type = %s, name = %s.\n", type.c_str(), name.c_str());
                 auto fn = get_layer_factory(type);
-                auto layer = fn(v, name, this->m_block_factory);
+                auto layer = fn(v, name, this);
                 config_layer(v, name, layer);
                 m_layer_cache[name] = layer;
                 is_created = true;
                 break;
             }
         }
-        if (!is_created){
+        if (!is_created) {
             printf("%s is not registed.\n", name.c_str());
             CHECK(is_created);
         }
@@ -242,9 +247,6 @@ void network::train() {
         }
 
         //begin
-        for (auto& layer : this->m_loop_train_layers){
-            layer->begin_seq();
-        }
         for (auto &layer : this->m_beg_layer_seq) {
             if (!layer->begin_seq()) {
                 goto finish_train;
@@ -258,7 +260,7 @@ void network::train() {
         for (auto &layers : this->m_activate_layer_seq) {
             for (auto& layer : layers) {
                 forward_history.push_back(layer);
-                if (!layer->forward()) {
+                if (!layer->forward_and_report()) {
                     goto end_forward;
                 }
             }
@@ -270,7 +272,7 @@ void network::train() {
         for_each(forward_history.rbegin(), 
             forward_history.rend(),
             [](layer_ptr &layer) {
-            layer->backward();
+            layer->backward_and_report();
         });
 
 
@@ -288,12 +290,9 @@ void network::set_input(const arraykd& data){
     input->signal() = data; //we don't need input has the same size
 }
 
-arraykd network::forward(){
+arraykd network::forward() {
     //beg
     if (m_t == 0) {
-        for (auto &layer : m_loop_train_layers){
-            layer->begin_seq();
-        }
         for (auto &layer : m_beg_layer_seq){
             layer->begin_seq();
         }

@@ -1,5 +1,6 @@
 #include "relu_layer.h"
 #include "utility.h"
+#include "network.h"
 using namespace std;
 
 relu_layer::relu_layer(
@@ -11,7 +12,7 @@ relu_layer::relu_layer(
     this->m_share = share;
 }
 
-void  relu_layer::setup_block() {
+void  relu_layer::setup_block(){
     CHECK(this->m_input_block->size() != 0);
     if (this->m_output_block->size() != 0){
         CHECK(cmp_array_dim(this->m_output_block->signal(), this->m_input_block->signal()));
@@ -104,12 +105,12 @@ void relu_layer::end_batch(int size) {
 layer_ptr create_relu_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf) {
+    network* net) {
     CHECK(config.contains("input"));
     CHECK(config.contains("share"));
     auto input_block_id = config.get("input").get<string>();
-    auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(layer_name);
+    auto input_block = net->block(input_block_id);
+    auto output_block = net->block(layer_name);
     bool share = config.get("share").get<bool>();
     return layer_ptr(new relu_layer(input_block, output_block, share));
 }

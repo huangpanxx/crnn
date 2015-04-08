@@ -131,6 +131,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -141,6 +142,7 @@
     <ClInclude Include="conv_layer.h" />
     <ClInclude Include="gru_layer.h" />
     <ClInclude Include="image_data_layer.h" />
+    <ClInclude Include="image_split_layer.h" />
     <ClInclude Include="inner_product_layer.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="loop_train_layer.h" />
@@ -168,6 +170,7 @@
     <ClCompile Include="conv_layer.cpp" />
     <ClCompile Include="gru_layer.cpp" />
     <ClCompile Include="image_data_layer.cpp" />
+    <ClCompile Include="image_split_layer.cpp" />
     <ClCompile Include="inner_product_layer.cpp" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="loop_train_layer.cpp" />

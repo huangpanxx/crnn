@@ -1,5 +1,6 @@
 #include "conv_layer.h"
 #include "utility.h"
+#include "network.h"
 using namespace std;
 
 conv_layer::conv_layer(
@@ -139,7 +140,7 @@ void conv_layer::backward() {
                             for (int ich = 0; ich < channels; ++ich){
                                 int nr = y + dr, nc = x + dc;
                                 ierror.at3(nr, nc, ich) += err * m_weights.at4(och, dr, dc, ich);
-                                m_grad_weights.at4(och, dr, dc,ich) += err * input.at3(nr, nc, ich);
+                                m_grad_weights.at4(och, dr, dc, ich) += err * input.at3(nr, nc, ich);
                             }
                         }
                     }
@@ -184,7 +185,7 @@ void conv_layer::load(std::istream& os){
 layer_ptr create_conv_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf) {
+    network* net) {
     auto name = config.get("name").get<string>();
     auto input_block_id = config.get("input").get<string>();
     int kernel_size = (int)config.get("kernel_size").get<double>();
@@ -192,8 +193,8 @@ layer_ptr create_conv_layer(
     int kernel_stride = (int)config.get("kernel_stride").get<double>();
     CHECK(kernel_size > 0);
     CHECK(kernel_num > 0);
-    auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(layer_name);
+    auto input_block = net->block(input_block_id);
+    auto output_block = net->block(layer_name);
     return layer_ptr(new conv_layer(input_block, output_block,
         kernel_size, kernel_num, kernel_stride));
     return 0;

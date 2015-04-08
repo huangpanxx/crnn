@@ -1,4 +1,5 @@
 #include "sigmoid_layer.h"
+#include "network.h"
 using namespace std;
 
 sigmoid_layer::sigmoid_layer(
@@ -59,10 +60,10 @@ bool sigmoid_layer::begin_seq() {
 layer_ptr create_sigmoid_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf) {
-    string input_block_id =  config.get("input").get<string>();
-    auto input_block = bf.get_block(input_block_id);
-    auto output_block = bf.get_block(layer_name);
+    network* net) {
+    string input_block_id = config.get("input").get<string>();
+    auto input_block = net->block(input_block_id);
+    auto output_block = net->block(layer_name);
     return layer_ptr(new sigmoid_layer(input_block, output_block));
 }
 

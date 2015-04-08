@@ -32,7 +32,7 @@ void test(){
 }
 
 int main(int argc, char **argv) {
-    test();
+    //test();
 
     string model_file = "";
     if (argc == 2) {

@@ -32,6 +32,7 @@ inline void print_check(const char* msg, const char* filename, int line) {
     std::cerr
         << "\"" << filename << "\", line " << line 
         << ": CHECK \"" << msg << "\" failed!" << std::endl;
+    assert(false);
     system("pause");
     exit(-1);
 }

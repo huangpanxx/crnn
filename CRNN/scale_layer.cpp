@@ -1,4 +1,6 @@
 #include "scale_layer.h"
+#include "network.h"
+using namespace std;
 
 scale_layer::scale_layer(block_ptr input, block_ptr output,
     float scale,float bias) {

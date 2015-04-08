@@ -1,5 +1,6 @@
 #include "inner_product_layer.h"
 #include "utility.h"
+#include "network.h"
 using namespace std;
 
 inner_product_layer::inner_product_layer(
@@ -171,7 +172,7 @@ void inner_product_layer::load(std::istream& is) {
 layer_ptr create_inner_product_layer(
     const picojson::value& config,
     const string& layer_name,
-    block_factory& bf) {
+    network* net) {
     auto inputs = config.get("inputs").get<picojson::array>();
     vector<string> input_ids;
     for (auto input : inputs) {
@@ -179,9 +180,9 @@ layer_ptr create_inner_product_layer(
         input_ids.push_back(id);
     }
     sort(input_ids.begin(), input_ids.end());
-    vector<block_ptr> input_blocks = bf.get_blocks(input_ids);
+    vector<block_ptr> input_blocks = net->blocks(input_ids);
 
-    auto output_block = bf.get_block(layer_name);
+    auto output_block = net->block(layer_name);
 
     int output_num = (int) config.get("output_num").get<double>();
 
