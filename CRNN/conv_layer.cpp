@@ -62,7 +62,7 @@ void conv_layer::setup_params() {
     //bias
     if (m_bias.size() == 0) {
         m_bias = arraykd(m_kernel_num);
-        m_bias.rand(0.01f, 0.5f);
+        m_bias.rand(-0.5f, 0.5f);
     }
     else{
         CHECK(m_bias.size() == m_kernel_num);
@@ -100,9 +100,9 @@ bool conv_layer::forward() {
                 int y = r * m_kernel_stride, x = c * m_kernel_stride;
 
                 //for input point
-                for (int dr = 0; dr < m_kernel_size; ++dr){
+                for (int dr = 0; dr < m_kernel_size; ++dr) {
                     for (int dc = 0; dc < m_kernel_size; ++dc) {
-                        for (int ch = 0; ch < channels; ++ch){
+                        for (int ch = 0; ch < channels; ++ch) {
                             int nr = y + dr, nc = x + dc;
                             output_unit += input.at3(nr, nc, ch) * m_weights.at4(och, dr, dc, ch);
                         }
@@ -150,8 +150,8 @@ void conv_layer::backward() {
         }
     }
 
-    m_input_history.pop_back();
     oerror.clear(0);
+    m_input_history.pop_back();
 };
 
 void conv_layer::end_batch(int size) {
@@ -189,16 +189,16 @@ layer_ptr create_conv_layer(
     network* net) {
     auto name = config.get("name").get<string>();
     auto input_block_id = config.get("input").get<string>();
-    int kernel_size = (int)config.get("kernel_size").get<double>();
-    int kernel_num = (int)config.get("kernel_num").get<double>();
-    int kernel_stride = (int)config.get("kernel_stride").get<double>();
+    int kernel_size = (int) config.get("kernel_size").get<double>();
+    int kernel_num = (int) config.get("kernel_num").get<double>();
+    int kernel_stride = (int) config.get("kernel_stride").get<double>();
     CHECK(kernel_size > 0);
     CHECK(kernel_num > 0);
     auto input_block = net->block(input_block_id);
     auto output_block = net->block(layer_name);
-    return layer_ptr(new conv_layer(input_block, output_block,
+    return layer_ptr(new conv_layer(
+        input_block, output_block,
         kernel_size, kernel_num, kernel_stride));
-    return 0;
 }
 
 REGISTER_LAYER(conv, create_conv_layer);

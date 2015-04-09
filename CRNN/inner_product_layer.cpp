@@ -122,7 +122,7 @@ void inner_product_layer::backward() {
     for (int i = 0; i < (int) inputs.size(); ++i) {
         auto& input = inputs[i];
         auto& gw = m_grad_weights[i];
-        int esz = error.size(), isz = input.size();
+        const int esz = error.size(), isz = input.size();
         OMP_FOR
         for (int j = 0; j < esz; ++j) {
             for (int k = 0; k < isz; ++k) {

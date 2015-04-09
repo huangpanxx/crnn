@@ -69,7 +69,7 @@ public:
     }
 
     void clear(float val = 0) {
-        int sz = this->size();
+        const int sz = this->size();
         OMP_FOR
         for (int i = 0; i < sz; ++i) {
             this->at(i) = val;

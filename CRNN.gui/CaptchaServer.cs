@@ -29,8 +29,12 @@ namespace CRNN.gui
             while (true)
             {
                 //single thread
-                var ctx = _listener.GetContext();
-                HandleSafe(ctx);
+                try
+                {
+                    var ctx = _listener.GetContext();
+                    HandleSafe(ctx);
+                }
+                catch { }
                 //ThreadPool.QueueUserWorkItem(new WaitCallback
                 //(x => HandleSafe(x as HttpListenerContext)), ctx);
             }
@@ -48,7 +52,8 @@ namespace CRNN.gui
             }
             finally
             {
-                ctx.Response.Close();
+                try { ctx.Response.Close(); }
+                catch { }
             }
         }
 
