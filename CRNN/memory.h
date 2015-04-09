@@ -297,10 +297,10 @@ public:
         return this->at(num*_rows*_cols*_channels + row*_cols*_channels + col*_channels + channel);
     }
 
-    inline int rows() const { return dim(0); }
-    inline int cols() const { return dim(1); }
-    inline int channels() const { return dim(2); }
-    inline int nums() const { return dim(3); }
+    inline int nums() const { return dim(0); }
+    inline int rows() const { return dim(1); }
+    inline int cols() const { return dim(2); }
+    inline int channels() const { return dim(3); }
 };
 
 

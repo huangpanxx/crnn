@@ -39,11 +39,9 @@ layer_ptr create_softmax_layer(
     const picojson::value& config,
     const string& layer_name,
     network *net){
-
     auto input_id =  config.get("input").get<string>();
     auto input_block = net->block(input_id);
     auto output_block = net->block(layer_name);
-
     return layer_ptr(new softmax_layer(input_block, output_block));
 }
 

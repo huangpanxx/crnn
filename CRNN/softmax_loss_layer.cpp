@@ -16,7 +16,7 @@ void softmax_loss_layer::setup_block() {
         m_input_block->resize(m_label_block->size());
     }
     CHECK(m_label_block->dims().size() == 1);
-    CHECK(m_input_block->size() == m_label_block->dims()[0]);
+    CHECK(m_input_block->size() == m_label_block->size());
     CHECK(m_label_block->size() > 0);
 };
 
@@ -29,11 +29,8 @@ bool softmax_loss_layer::forward(){
     auto& input = m_input_block->signal();
     arraykd &label = m_label_block->signal();
     arraykd &output = m_input_block->signal().clone();
-
     softmax_normalize(input, output);
-
     m_output_history.push_back(output);
-
     return true;
 }
 
@@ -45,9 +42,13 @@ void softmax_loss_layer::backward() {
 
     for (int i = 0; i < error.size(); ++i) {
         float &err = error.at(i);
-        err += label.at(i) - output.at(i);
+        float lbl = label.at(i);
+        float opt = output.at(i);
+        err += lbl - opt;
         m_loss_sum += -label.at(i) * log(1e-15f + output.at(i));
     }
+
+
     m_loss_num += 1;
     m_output_history.pop_back();
 }

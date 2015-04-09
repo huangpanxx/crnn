@@ -4,6 +4,8 @@
 using namespace std;
 
 void test_code(){
+    test_gru_layer();
+
     auto op = get_default_array_operator();
     int m = 512, n = 1024;
     array2d a(m, n);
@@ -32,8 +34,7 @@ void test(){
 }
 
 int main(int argc, char **argv) {
-    //test();
-
+    //test_code();
     string model_file = "";
     if (argc == 2) {
         model_file = argv[1];

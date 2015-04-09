@@ -46,12 +46,11 @@ void conv_layer::setup_block() {
 
 void conv_layer::setup_params() {
     int channels = m_input_block->dims()[2];
-
     float bound = sqrtf(6.0f / (m_input_block->size() + m_output_block->size()));
 
     //weights
     if (m_weights.size() == 0){
-        m_weights = array4d(m_kernel_size, m_kernel_size, channels, m_kernel_num);
+        m_weights = array4d(m_kernel_num, m_kernel_size, m_kernel_size, channels);
         m_weights.rand(-bound, bound);
     }
 
@@ -90,7 +89,7 @@ bool conv_layer::forward() {
     int rows = input.rows(), cols = input.cols(), channels = input.channels();
     const int orows = output.rows(), ocols = output.cols(), ochannels = m_weights.nums();
 
-    //for each output point
+    //for output point
     OMP_FOR
     for (int r = 0; r < orows; ++r) {
         for (int c = 0; c < ocols; ++c) {
@@ -99,7 +98,8 @@ bool conv_layer::forward() {
                 float &output_unit = output.at3(r, c, och);
                 output_unit = bias;
                 int y = r * m_kernel_stride, x = c * m_kernel_stride;
-                //for input region
+
+                //for input point
                 for (int dr = 0; dr < m_kernel_size; ++dr){
                     for (int dc = 0; dc < m_kernel_size; ++dc) {
                         for (int ch = 0; ch < channels; ++ch){
@@ -131,9 +131,10 @@ void conv_layer::backward() {
         for (int r = 0; r < orows; ++r) {
             for (int c = 0; c < ocols; ++c) {
                 for (int och = 0; och < ochannels; ++och) {
-                    auto& gb = m_grad_bias.at(och);
                     float err = oerror.at3(r, c, och);
-                    gb += err;
+                    m_grad_bias.at(och) += err;
+
+                    //for input point
                     int y = r * m_kernel_stride, x = c * m_kernel_stride;
                     for (int dr = 0; dr < m_kernel_size; ++dr) {
                         for (int dc = 0; dc < m_kernel_size; ++dc) {

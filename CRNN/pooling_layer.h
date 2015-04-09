@@ -24,9 +24,4 @@ private:
     int m_stride;
 };
 
-//class mean_pooling_layer : public layer{
-//public:
-//    mean_pooling_layer(block_ptr input_block, block_ptr output_block);
-//};
-
 #endif
