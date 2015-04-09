@@ -93,19 +93,21 @@ image_split_helper::image_split_helper(
 
 array3d image_split_helper::image_slice(int k){
     array3d slice(m_height, m_width, 3);
+    const int offset = std::min(k*m_stride, m_image.cols() - m_width);
     OMP_FOR
-    for (int r = 0; r < m_height; ++r){
-        for (int c = 0; c < m_width; ++c){
-            for (int ch = 0; ch < 3; ++ch){
-                slice.at3(r, c, ch) = m_image.at3(r, c + k*m_stride, ch);
+    for (int r = 0; r < m_height; ++r) {
+        for (int c = 0; c < m_width; ++c) {
+            for (int ch = 0; ch < 3; ++ch) {
+                slice.at3(r, c, ch) = m_image.at3(r, c + offset, ch);
             }
         }
     }
     return slice;
 }
 
-int image_split_helper::image_slice_num(){
-    return (m_image.cols() - m_width) / m_stride + 1;
+int image_split_helper::image_slice_num() {
+    int w = m_image.cols() - m_width;
+    return (w / m_stride) + ((w % m_stride == 0) ? 1 : 2);
 }
 
 
