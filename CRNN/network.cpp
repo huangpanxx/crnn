@@ -209,15 +209,24 @@ void network::train() {
     CHECK(batch >= 1);
 
     auto start_time = clock();
-    for (int iter = 0; ; ++iter) {
+    vector<float> latest_losses;
+
+    for (int iter = 0;; ++iter) {
         const int epoch = iter / batch;
         //batch
         if (iter % batch == 0 && iter) {
             //print info
             float freq = (float) (batch) * CLOCKS_PER_SEC / (clock() - start_time);
             float loss = m_loss_layer->loss();
-            printf("epoch %d, %.3f iter/s, loss = %.8f.                     \n",
-                epoch, freq, loss);
+            latest_losses.push_back(loss);
+            while (latest_losses.size() > 20){
+                latest_losses.erase(latest_losses.begin());
+            }
+            float loss_sum = accumulate(latest_losses.begin(), latest_losses.end(), 0.0f);
+            float loss_mean = loss_sum / latest_losses.size();
+
+            ::printf("epoch %d, %.3f iter/s, loss = %.8f, loss_mean = %.8f.          \n",
+                epoch, freq, loss, loss_mean);
 
             //end batch
             for (auto &layer : this->m_beg_layer_seq) {
@@ -226,7 +235,7 @@ void network::train() {
 
             //save
             if (epoch % m_save_epoch == m_save_epoch - 1) {
-                printf("save model ...\n");
+                ::printf("save model ...\n");
                 ofstream os(m_model_file, ios::binary | ios::out);
                 CHECK(os);
                 save_layers(os, m_layer_cache);
@@ -235,7 +244,7 @@ void network::train() {
 
             //skip
             if (loss < m_stop_loss) {
-                printf("move to next batch.\n");
+                ::printf("move to next batch.\n");
                 m_data_layer->move_to_next_batch();
             }
             start_time = clock();
@@ -260,11 +269,11 @@ void network::train() {
                 }
             }
         }
-        end_forward:
+    end_forward:
 
 
         //backward
-        for_each(forward_history.rbegin(), 
+        for_each(forward_history.rbegin(),
             forward_history.rend(),
             [](layer_ptr &layer) {
             layer->backward_and_report();
@@ -272,10 +281,10 @@ void network::train() {
 
 
         //info
-        printf("epoch %d, iter %d.\r", epoch, iter);
+        ::printf("epoch %d, iter %d.\r", epoch, iter);
     }
-    finish_train:
-    printf("train finished.\n");
+finish_train:
+    ::printf("train finished.\n");
 }
 
 void network::set_input(const arraykd& data){

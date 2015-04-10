@@ -13,6 +13,7 @@
 #include <map>
 #include <ctime>
 #include <unordered_map>
+#include <numeric>
 
 #ifndef _DEBUG
 
