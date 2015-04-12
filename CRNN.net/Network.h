@@ -14,7 +14,6 @@ namespace CRNNnet {
         void SetInput(FloatArray^ data);
         FloatArray^ Forward();
         System::String^ Translate(int k);
-        array<int>^ InputDims();
 
     private:
         network *m_pnetwork;

@@ -23,25 +23,27 @@ namespace CRNN.gui
         {
             if (_network == null)
                 throw new Exception("You must load model first!");
-
-            DateTime now = DateTime.Now;
-            using (var data = Utility.ImageToFloatArray(image))
+            lock (_network)
             {
-                _network.SetInput(data);
-                Captcha cap = new Captcha();
-                for (int i = 0; i < maxLen; ++i)
+                DateTime now = DateTime.Now;
+                using (var data = Utility.ImageToFloatArray(image))
                 {
-                    using (var arr = _network.Forward())
+                    _network.SetInput(data);
+                    Captcha cap = new Captcha();
+                    for (int i = 0; i < maxLen; ++i)
                     {
-                        int k = arr.ArgMax();
-                        string s = _network.Translate(k);
-                        if (s == "eof") { break; }
-                        float prob = arr.At(k);
-                        cap.Labels.Add(new Captcha.Label(s, prob));
+                        using (var arr = _network.Forward())
+                        {
+                            int k = arr.ArgMax();
+                            string s = _network.Translate(k);
+                            if (s == "eof") { break; }
+                            float prob = arr.At(k);
+                            cap.Labels.Add(new Captcha.Label(s, prob));
+                        }
                     }
+                    cap.Time = (float)(DateTime.Now - now).TotalMilliseconds;
+                    return cap;
                 }
-                cap.Time = (float)(DateTime.Now - now).TotalMilliseconds;
-                return cap;
             }
         }
 

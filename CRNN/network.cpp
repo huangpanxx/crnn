@@ -219,7 +219,8 @@ void network::train() {
             float freq = (float) (batch) * CLOCKS_PER_SEC / (clock() - start_time);
             float loss = m_loss_layer->loss();
             latest_losses.push_back(loss);
-            while (latest_losses.size() > 20){
+            const int window_size = 70;
+            while (latest_losses.size() > window_size){
                 latest_losses.erase(latest_losses.begin());
             }
             float loss_sum = accumulate(latest_losses.begin(), latest_losses.end(), 0.0f);

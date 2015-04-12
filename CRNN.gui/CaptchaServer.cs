@@ -28,17 +28,15 @@ namespace CRNN.gui
             Console.WriteLine("Serve on port {0}.", port);
             while (true)
             {
-                //single thread
                 try
                 {
                     var ctx = _listener.GetContext();
-                    HandleSafe(ctx);
+                    ThreadPool.QueueUserWorkItem(new WaitCallback
+                    (x => HandleSafe(x as HttpListenerContext)), ctx);
                 }
                 catch { }
-                //ThreadPool.QueueUserWorkItem(new WaitCallback
-                //(x => HandleSafe(x as HttpListenerContext)), ctx);
             }
-        }
+        } 
 
         private void HandleSafe(HttpListenerContext ctx)
         {
