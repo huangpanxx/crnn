@@ -36,24 +36,27 @@ namespace CRNN.gui
                 }
                 catch { }
             }
-        } 
+        }
 
         private void HandleSafe(HttpListenerContext ctx)
         {
-            try { Handle(ctx); }
-            catch (Exception e)
+            try
             {
-                using (var sw = new StreamWriter(ctx.Response.OutputStream))
+                try { Handle(ctx); }
+                catch (Exception e)
                 {
-                    sw.WriteLine("{0}", e.Message);
+                    using (var sw = new StreamWriter(ctx.Response.OutputStream))
+                    {
+                        sw.WriteLine("{0}", e.Message);
+                    }
                 }
-            }
-            finally
-            {
-                try { ctx.Response.Close(); }
-                catch { }
-            }
-        }
+                finally
+                {
+                    ctx.Response.Close();
+                } 
+            } 
+            catch { }
+        } 
 
         private void Handle(HttpListenerContext ctx)
         {
