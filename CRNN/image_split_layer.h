@@ -7,7 +7,9 @@ class image_split_helper {
 public:
     image_split_helper(
         const array3d& image,
-        int width, int height, int stride);
+        int width, int height, 
+        int stride,
+        int leftshift, int rightshift);
 
     image_split_helper() : m_image(0, 0, 0){ };
 
@@ -20,6 +22,7 @@ private:
     int m_stride;
     int m_height;
     int m_width;
+    int m_leftshift, m_rightshift;
 };
 
 
@@ -27,7 +30,9 @@ class image_slice_layer : public feed_data_layer {
 public:
     image_slice_layer(block_ptr data_block,
         int width, int height, 
-        int stride_min,int stride_max);
+        int stride_min,int stride_max,
+        int left_shift_min, int left_shift_max,
+        int right_shift_min, int right_shift_max);
     virtual void setup_block();
     virtual bool begin_seq();
     virtual bool forward();
@@ -39,6 +44,8 @@ private:
     int m_t;
     int m_width, m_height;
     int m_stride_min, m_stride_max;
+    int m_left_shift_min, m_left_shift_max;
+    int m_right_shift_min, m_right_shift_max;
 };
 
 class label_slice_layer : public layer {
@@ -64,6 +71,8 @@ public:
         const std::string& data_dir,
         int width, int height,
         int stride_min,int stride_max,
+        int leftshift_min, int leftshift_max,
+        int rightshift_min, int rightshift_max,
         int batch, int label_size,
         block_ptr data_block,
         block_ptr label_block);

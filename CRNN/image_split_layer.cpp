@@ -12,14 +12,22 @@ array3d resize(const array3d& src, int width, int height, int stride){
     return resize(src, new_width, height);
 }
 
-image_slice_layer::image_slice_layer(block_ptr data_block,int width,int height,
-    int stride_min,int stride_max) {
+image_slice_layer::image_slice_layer(
+    block_ptr data_block,
+    int width,int height,
+    int stride_min,int stride_max,
+    int left_shift_min, int left_shift_max,
+    int right_shift_min, int right_shift_max) {
     this->m_data_block = data_block;
     this->m_t = 0;
     this->m_width = width;
     this->m_height = height;
     this->m_stride_min = stride_min;
     this->m_stride_max = stride_max;
+    this->m_left_shift_min = left_shift_min;
+    this->m_left_shift_max = left_shift_max;
+    this->m_right_shift_min = right_shift_min;
+    this->m_right_shift_max = right_shift_max;
 }
 
 void image_slice_layer::setup_block(){
@@ -45,7 +53,9 @@ void image_slice_layer::set_data(const arraykd& data){
     array3d image = data;
     CHECK(image.dim() == 3 && image.dim(2) == 3);
     int stride = m_stride_min + (::rand() % (m_stride_max - m_stride_min + 1));
-    this->m_helper = image_split_helper(image, m_width, m_height, stride);
+    int leftshift = m_left_shift_min + (::rand() % (m_left_shift_max - m_left_shift_min + 1));
+    int rightshift = m_right_shift_min + (::rand() % (m_right_shift_max - m_right_shift_min + 1));
+    this->m_helper = image_split_helper(image, m_width, m_height, stride, leftshift, rightshift);
     this->m_t = 0;
 }
 
@@ -87,21 +97,32 @@ void label_slice_layer::set_label(const vector<int>& labels){
 
 image_split_helper::image_split_helper(
     const array3d& image,
-    int width, int height, int stride) : m_image(resize(image, width, height, stride)) {
+    int width, int height,
+    int stride,
+    int leftshift, int rightshift) : m_image(resize(image, width, height, stride)) {
     this->m_width = width;
     this->m_height = height;
     this->m_stride = stride;
     this->m_image = resize(image, width, height, stride);
+    this->m_leftshift = leftshift;
+    this->m_rightshift = rightshift;
 }
 
 array3d image_split_helper::image_slice(int k){
     array3d slice(m_height, m_width, 3);
-    const int offset = std::min(k*m_stride, m_image.cols() - m_width);
+    const int offset = k * m_stride - m_leftshift;
+    const int width = m_image.cols();
     OMP_FOR
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
             for (int ch = 0; ch < 3; ++ch) {
-                slice.at3(r, c, ch) = m_image.at3(r, c + offset, ch);
+                const int nc = c + offset;
+                if (nc >= 0 && nc < width) {
+                    slice.at3(r, c, ch) = m_image.at3(r, nc, ch);
+                }
+                else{
+                    slice.at3(r, c, ch) = 0;
+                }
             }
         }
     }
@@ -109,7 +130,7 @@ array3d image_split_helper::image_slice(int k){
 }
 
 int image_split_helper::image_slice_num() {
-    int w = m_image.cols() - m_width;
+    int w = m_image.cols() + m_leftshift + m_rightshift - m_width;
     return (w / m_stride) + ((w % m_stride == 0) ? 1 : 2);
 }
 
@@ -119,6 +140,8 @@ image_split_layer::image_split_layer(
     const std::string& data_dir,
     int width, int height,
     int stride_min, int stride_max,
+    int leftshift_min, int leftshift_max,
+    int rightshift_min, int rightshift_max,
     int batch, int label_size,
     block_ptr data_block, block_ptr label_block) {
     this->m_width = width;
@@ -131,7 +154,10 @@ image_split_layer::image_split_layer(
     this->m_data_block = data_block;
     this->m_label_block = label_block;
     this->m_data_dir = data_dir;
-    this->m_image_slice_layer.reset(new image_slice_layer(data_block, width, height, stride_min,stride_max));
+    this->m_image_slice_layer.reset(new image_slice_layer(data_block, width,
+        height, stride_min, stride_max,
+        leftshift_min, leftshift_max,
+        rightshift_min, rightshift_max));
     this->m_label_slice_layer.reset(new label_slice_layer(label_block, label_size));
     this->m_samples = read_label_file(label_file);
     CHECK(!m_samples.empty());
@@ -189,10 +215,15 @@ static layer_ptr create_image_split_layer(
     const picojson::value& config,
     const string& layer_name,
     network* net) {
-    CHECK(config.contains("label_file")); CHECK(config.contains("data_dir"));
-    CHECK(config.contains("width")); CHECK(config.contains("height"));
-    CHECK(config.contains("stride")); CHECK(config.contains("batch"));
+    CHECK(config.contains("label_file")); 
+    CHECK(config.contains("data_dir"));
+    CHECK(config.contains("width")); 
+    CHECK(config.contains("height"));
+    CHECK(config.contains("stride")); 
+    CHECK(config.contains("batch"));
     CHECK(config.contains("label_size"));
+    CHECK(config.contains("shift"));
+
     auto label_file = config.get("label_file").get<string>();
     auto data_dir = config.get("data_dir").get<string>();
     auto width = (int) config.get("width").get<double>();
@@ -202,6 +233,14 @@ static layer_ptr create_image_split_layer(
     int stride_min = (int)stride_arr[0].get<double>();
     int stride_max = (int)stride_arr[1].get<double>();
     CHECK(stride_max >= stride_min);
+
+    auto shift_arr =  config.get("shift").get<picojson::array>();
+    CHECK(shift_arr.size() == 4);
+    int leftshift_min = (int) shift_arr[0].get<double>();
+    int leftshift_max = (int) shift_arr[1].get<double>();
+    int rightshift_min = (int) shift_arr[2].get<double>();
+    int rightshift_max = (int) shift_arr[3].get<double>();
+
     auto batch = (int) config.get("batch").get<double>();
     auto label_size = (int) config.get("label_size").get<double>();
     auto data_block = net->block("data");
@@ -209,6 +248,8 @@ static layer_ptr create_image_split_layer(
     auto layer = new image_split_layer(
         label_file, data_dir, width, height,
         stride_min, stride_max,
+        leftshift_min, leftshift_max,
+        rightshift_min, rightshift_max,
         batch, label_size, data_block, label_block);
     layer->get_image_slice_layer()->set_name(layer_name + ".data");
     layer->get_label_slice_layer()->set_name(layer_name + ".label");
@@ -226,14 +267,25 @@ static layer_ptr create_image_slice_layer(
     CHECK(config.contains("width"));
     CHECK(config.contains("height"));
     CHECK(config.contains("stride"));
+    CHECK(config.contains("shift"));
     int width = (int) config.get("width").get<double>();
     int height = (int) config.get("height").get<double>();
-    auto stride_arr =  config.get("stride").get<picojson::array>();
+    auto stride_arr = config.get("stride").get<picojson::array>();
     CHECK(stride_arr.size() == 2);
-    int stride_min = (int)stride_arr[0].get<double>();
-    int stride_max = (int)stride_arr[1].get<double>();
+    int stride_min = (int) stride_arr[0].get<double>();
+    int stride_max = (int) stride_arr[1].get<double>();
+
+    auto shift_arr = config.get("shift").get<picojson::array>();
+    CHECK(shift_arr.size() == 4);
+    int leftshift_min = (int) shift_arr[0].get<double>();
+    int leftshift_max = (int) shift_arr[1].get<double>();
+    int rightshift_min = (int) shift_arr[2].get<double>();
+    int rightshift_max = (int) shift_arr[3].get<double>();
+
     auto &block = net->block("data");
-    return layer_ptr(new image_slice_layer(block, width, height, stride_min, stride_max));
+    return layer_ptr(new image_slice_layer(block, width, height,
+        stride_min, stride_max, leftshift_min, leftshift_max,
+        rightshift_min, rightshift_max));
 }
 
 REGISTER_LAYER(image_slice, create_image_slice_layer);
