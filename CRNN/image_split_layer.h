@@ -26,7 +26,8 @@ private:
 class image_slice_layer : public feed_data_layer {
 public:
     image_slice_layer(block_ptr data_block,
-        int width, int height, int stride);
+        int width, int height, 
+        int stride_min,int stride_max);
     virtual void setup_block();
     virtual bool begin_seq();
     virtual bool forward();
@@ -36,7 +37,8 @@ private:
     image_split_helper m_helper;
     block_ptr m_data_block;
     int m_t;
-    int m_width, m_height, m_stride;
+    int m_width, m_height;
+    int m_stride_min, m_stride_max;
 };
 
 class label_slice_layer : public layer {
@@ -61,8 +63,8 @@ public:
         const std::string& label_file,
         const std::string& data_dir,
         int width, int height,
-        int stride, int batch,
-        int label_size,
+        int stride_min,int stride_max,
+        int batch, int label_size,
         block_ptr data_block,
         block_ptr label_block);
 
@@ -87,7 +89,7 @@ public:
 private:
     long m_index;
     int m_batch, m_label_size;
-    int m_width, m_height, m_stride;
+    int m_width, m_height, m_stride_min, m_stride_max;
     std::vector<std::pair<std::string, std::vector<int> > > m_samples;
     layer_ptr m_image_slice_layer;
     layer_ptr m_label_slice_layer;

@@ -65,8 +65,8 @@ static bool dummy_fn(){
     multi_softmax_loss_layer({}, block_ptr(0));
     image_data_layer("", "", 0, 0, 1, 1, 1, 1);
     softmax_layer(0, 0);
-    image_split_layer("", "", 0, 0, 0, 0, 0, 0, 0);
-    image_slice_layer(0, 0, 0, 0);
+    image_split_layer("", "", 0, 0, 0, 0, 0, 0, 0, 0);
+    image_slice_layer(0, 0, 0, 0, 0);
     return true;
 }
 

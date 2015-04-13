@@ -12,12 +12,14 @@ array3d resize(const array3d& src, int width, int height, int stride){
     return resize(src, new_width, height);
 }
 
-image_slice_layer::image_slice_layer(block_ptr data_block,int width,int height,int stride){
+image_slice_layer::image_slice_layer(block_ptr data_block,int width,int height,
+    int stride_min,int stride_max) {
     this->m_data_block = data_block;
     this->m_t = 0;
     this->m_width = width;
     this->m_height = height;
-    this->m_stride = stride;
+    this->m_stride_min = stride_min;
+    this->m_stride_max = stride_max;
 }
 
 void image_slice_layer::setup_block(){
@@ -42,7 +44,8 @@ bool image_slice_layer::forward() {
 void image_slice_layer::set_data(const arraykd& data){
     array3d image = data;
     CHECK(image.dim() == 3 && image.dim(2) == 3);
-    this->m_helper = image_split_helper(image, m_width, m_height, m_stride);
+    int stride = m_stride_min + (::rand() % (m_stride_max - m_stride_min + 1));
+    this->m_helper = image_split_helper(image, m_width, m_height, stride);
     this->m_t = 0;
 }
 
@@ -114,19 +117,21 @@ int image_split_helper::image_slice_num() {
 image_split_layer::image_split_layer(
     const std::string& label_file,
     const std::string& data_dir,
-    int width, int height, int stride,
+    int width, int height,
+    int stride_min, int stride_max,
     int batch, int label_size,
     block_ptr data_block, block_ptr label_block) {
     this->m_width = width;
     this->m_height = height;
-    this->m_stride = stride;
+    this->m_stride_min = stride_min;
+    this->m_stride_max = stride_max;
     this->m_batch = batch;
     this->m_index = 0;
     this->m_label_size = label_size;
     this->m_data_block = data_block;
     this->m_label_block = label_block;
     this->m_data_dir = data_dir;
-    this->m_image_slice_layer.reset(new image_slice_layer(data_block, width, height, stride));
+    this->m_image_slice_layer.reset(new image_slice_layer(data_block, width, height, stride_min,stride_max));
     this->m_label_slice_layer.reset(new label_slice_layer(label_block, label_size));
     this->m_samples = read_label_file(label_file);
     CHECK(!m_samples.empty());
@@ -192,13 +197,19 @@ static layer_ptr create_image_split_layer(
     auto data_dir = config.get("data_dir").get<string>();
     auto width = (int) config.get("width").get<double>();
     auto height = (int) config.get("height").get<double>();
-    auto stride = (int) config.get("stride").get<double>();
+    auto stride_arr =  config.get("stride").get<picojson::array>();
+    CHECK(stride_arr.size() == 2);
+    int stride_min = (int)stride_arr[0].get<double>();
+    int stride_max = (int)stride_arr[1].get<double>();
+    CHECK(stride_max >= stride_min);
     auto batch = (int) config.get("batch").get<double>();
     auto label_size = (int) config.get("label_size").get<double>();
     auto data_block = net->block("data");
     auto label_block = net->block("label");
-    auto layer = new image_split_layer(label_file, data_dir, width, height,
-        stride, batch, label_size, data_block, label_block);
+    auto layer = new image_split_layer(
+        label_file, data_dir, width, height,
+        stride_min, stride_max,
+        batch, label_size, data_block, label_block);
     layer->get_image_slice_layer()->set_name(layer_name + ".data");
     layer->get_label_slice_layer()->set_name(layer_name + ".label");
     net->add_layer(layer->get_image_slice_layer());
@@ -217,9 +228,12 @@ static layer_ptr create_image_slice_layer(
     CHECK(config.contains("stride"));
     int width = (int) config.get("width").get<double>();
     int height = (int) config.get("height").get<double>();
-    int stride = (int) config.get("stride").get<double>();
+    auto stride_arr =  config.get("stride").get<picojson::array>();
+    CHECK(stride_arr.size() == 2);
+    int stride_min = (int)stride_arr[0].get<double>();
+    int stride_max = (int)stride_arr[1].get<double>();
     auto &block = net->block("data");
-    return layer_ptr(new image_slice_layer(block, width, height, stride));
+    return layer_ptr(new image_slice_layer(block, width, height, stride_min, stride_max));
 }
 
 REGISTER_LAYER(image_slice, create_image_slice_layer);
