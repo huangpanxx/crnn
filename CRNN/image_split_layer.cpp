@@ -112,6 +112,7 @@ array3d image_split_helper::image_slice(int k){
     array3d slice(m_height, m_width, 3);
     const int offset = k * m_stride - m_leftshift;
     const int width = m_image.cols();
+    const float fill = (float) (::rand() % 2);
     OMP_FOR
     for (int r = 0; r < m_height; ++r) {
         for (int c = 0; c < m_width; ++c) {
@@ -121,7 +122,7 @@ array3d image_split_helper::image_slice(int k){
                     slice.at3(r, c, ch) = m_image.at3(r, nc, ch);
                 }
                 else{
-                    slice.at3(r, c, ch) = 0;
+                    slice.at3(r, c, ch) = fill;
                 }
             }
         }
