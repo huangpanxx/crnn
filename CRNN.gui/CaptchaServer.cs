@@ -64,7 +64,7 @@ namespace CRNN.gui
             {
                 using (var image = Bitmap.FromStream(stream))
                 {
-                    var captcha = _engine.ReadCaptcha(image);
+                    Captcha captcha = _engine.ReadCaptcha(image, 1, 1, 10).First();
                     using (var sr = new StreamWriter(ctx.Response.OutputStream))
                     {
                         sr.WriteLine(captcha.ToString());

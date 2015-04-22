@@ -19,33 +19,100 @@ namespace CRNN.gui
             _network = new Network(json, plan);
         }
 
-        public Captcha ReadCaptcha(Image image, int maxLen = 10)
+        Tuple<float, List<Captcha.Label>> AddLabel(Tuple<float, List<Captcha.Label>> tp, Captcha.Label label)
         {
-            if (_network == null)
-                throw new Exception("You must load model first!");
+            var ls = tp.Item2.ToList();
+            ls.Add(label);
+            return new Tuple<float, List<Captcha.Label>>(tp.Item1 * label.Prob, ls);
+        }
+
+        List<Tuple<float, List<Captcha.Label>>> AddLabel(List<Tuple<float, List<Captcha.Label>>> ls, Captcha.Label label)
+        {
+            if (ls.Count == 0)
+            {
+                return new List<Tuple<float, List<Captcha.Label>>>()
+                {
+                    new Tuple<float,List<Captcha.Label>>(label.Prob, new List<Captcha.Label>()
+                    {
+                        label
+                    })
+                };
+            }
+            return ls.Select(x =>
+            {
+                if (x.Item2.Last().Name == "eof")
+                    return x;
+                return AddLabel(x, label);
+            }).ToList();
+        }
+        
+
+        List<Tuple<float, List<Captcha.Label>>> AddLabels(List<Tuple<float, List<Captcha.Label>>> ls, List<Captcha.Label> labels)
+        {
+            List<Tuple<float, List<Captcha.Label>>> res = new List<Tuple<float, List<Captcha.Label>>>();
+            foreach (var label in labels)
+            {
+                var nl = AddLabel(ls, label);
+                res.AddRange(nl);
+            }
+            return res;
+        }
+
+
+        public List<Captcha> ReadCaptcha(Image image, int size = 5, int top = 5, int maxLen = 10)
+        {
+            if (_network == null) throw new Exception("You must load model first!");
             lock (_network)
             {
                 DateTime now = DateTime.Now;
                 using (var data = Utility.ImageToFloatArray(image))
                 {
                     _network.SetInput(data);
-                    Captcha cap = new Captcha();
+                    var set = new List<Tuple<float, List<Captcha.Label>>>();
+
                     for (int i = 0; i < maxLen; ++i)
                     {
                         using (var arr = _network.Forward())
                         {
-                            int k = arr.ArgMax();
-                            string s = _network.Translate(k);
-                            if (s == "eof") { break; }
-                            float prob = arr.At(k);
-                            cap.Labels.Add(new Captcha.Label(s, prob));
+                            //predict all labels
+                            List<int> idxes = Utility.SortByValue(arr);
+                            List<Captcha.Label> labels = new List<Captcha.Label>();
+                            for (int j = 0; j < Math.Min(top, idxes.Count); ++j)
+                            {
+                                int k = idxes[j];
+                                string s = _network.Translate(k);
+                                float prob = arr.At(k);
+                                labels.Add(new Captcha.Label(s, prob));
+                            }
+                            //update set
+                            set = AddLabels(set, labels);
+                            set.Sort();
+                            set.Reverse();
+                            set = set.Take(size).ToList();
+                            //continue?
+                            bool isContinue = false;
+                            foreach (var seq in set)
+                            {
+                                if (seq.Item2.Last().Name != "eof")
+                                {
+                                    isContinue = true;
+                                    break;
+                                }
+                            }
+                            if (!isContinue) break;
                         }
                     }
-                    cap.Time = (float)(DateTime.Now - now).TotalMilliseconds;
-                    return cap;
+                    var time = (float)(DateTime.Now - now).TotalMilliseconds;
+                    return set.Select(x =>
+                    {
+                        var cap = new Captcha();
+                        cap.Labels.AddRange(x.Item2.Take(x.Item2.Count - 1));
+                        cap.Time = time;
+                        return cap;
+                    }).ToList();
                 }
             }
-        }
+        } 
 
         public void Dispose()
         {

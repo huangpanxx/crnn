@@ -48,9 +48,30 @@ layer_factory_fn get_layer_factory(string name){
 #include "image_data_layer.h"
 #include "softmax_layer.h"
 
+
 //this function will never be called
 //it just forces linker to link all the layer files
 static bool dummy_fn(){
+
+//#define MAKE_REF(x) std::shared_ptr<x>(0);
+//    MAKE_REF(conv_layer);
+//    MAKE_REF(relu_layer);
+//    MAKE_REF(sigmoid_layer);
+//    MAKE_REF(multi_softmax_layer);
+//    MAKE_REF(inner_product_layer);
+//    MAKE_REF(gru_layer);
+//    MAKE_REF(softmax_loss_layer);
+//    MAKE_REF(add_layer);
+//    MAKE_REF(wise_product_layer);
+//    MAKE_REF(tanh_layer);
+//    MAKE_REF(max_pooling_layer);
+//    MAKE_REF(multi_softmax_loss_layer);
+//    MAKE_REF(image_data_layer);
+//    MAKE_REF(softmax_layer);
+//    MAKE_REF(image_split_layer);
+//    MAKE_REF(image_slice_layer);
+//#undef MAKE_REF
+
     conv_layer(0, 0, 2, 2, 2);
     relu_layer(0, 0, false);
     sigmoid_layer(0, 0);
@@ -65,8 +86,8 @@ static bool dummy_fn(){
     multi_softmax_loss_layer({}, block_ptr(0));
     image_data_layer("", "", 0, 0, 1, 1, 1, 1);
     softmax_layer(0, 0);
-    image_split_layer("", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    image_slice_layer(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    image_split_layer("", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    image_slice_layer(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     return true;
 }
 

@@ -11,6 +11,17 @@ namespace CRNN.gui
 {
     public class Utility
     {
+        public static List<int> SortByValue(FloatArray arr)
+        {
+            List<Tuple<float, int>> tuples = new List<Tuple<float, int>>();
+            for (int i = 0; i < arr.Size(); ++i)
+            {
+                tuples.Add(new Tuple<float, int>(arr.At(i), i));
+            }
+            tuples.Sort();
+            return tuples.Select(x => x.Item2).Reverse().ToList();
+        }
+
         public static FloatArray ImageToFloatArray(Image image)
         {
             const float div = 255.0f * 255.0f;

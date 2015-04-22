@@ -77,6 +77,11 @@ public:
     virtual void set_data(const arraykd& data) = 0;
 };
 
+class feed_label_layer : public layer{
+public:
+    virtual void set_label(const std::vector<int>& labels) = 0;
+};
+
 
 typedef std::shared_ptr<layer> layer_ptr;
 
